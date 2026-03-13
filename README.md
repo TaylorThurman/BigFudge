@@ -146,14 +146,5 @@ Connect ticket tracking to an external board (ClickUp, Linear, Jira) so tickets 
 ### Document Store (MCP)
 Move SDLC documents (product spec, architecture blueprint, implementation spec, test plan) out of the project repo and into a dedicated document store. Keeps the repo focused on code while making specs accessible across projects. Managed via MCP connector.
 
-### Scheduled Implementation Loop
-Run the implementation-loop as a cron job that periodically checks TRACKER.md for ready tickets and builds them automatically. Removes the need to manually trigger the loop after planning completes.
-
-### Trading Strategy Research Chain
-An upstream chain that researches, backtests, and validates trading strategies before feeding approved strategies into the sdlc-router as structured requirements. Closes the loop from "research idea" to "deployed strategy."
-
-### Skill Packaging and Distribution
-Package the skill chain for sharing and installation. Make it possible to install the full SDLC chain into a new environment with a single command.
-
 ### Output Structure Review
 Audit the file and folder structure that skills produce to ensure generated artifacts land in clean, consistent directories across projects.

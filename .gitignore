@@ -1,0 +1,15 @@
+# Eval workspaces — reproducible, bulky
+evals/
+
+# IDE / editor
+.obsidian/
+.vscode/
+*.swp
+*.swo
+
+# Claude session data
+.claude/
+
+# OS
+.DS_Store
+Thumbs.db

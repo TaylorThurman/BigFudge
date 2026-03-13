@@ -144,7 +144,7 @@ issue-triage
 Connect ticket tracking to an external board (ClickUp, Linear, Jira) so tickets live in a proper PM tool instead of markdown files. The tickets skill would create items on the board, the implementation-loop would read status from it, and the issue-triage would create bug tickets there. Managed via MCP connector.
 
 ### Document Store (MCP)
-Move SDLC documents (product spec, architecture blueprint, implementation spec, test plan) out of the project repo and into a dedicated document store. Keeps the repo focused on code while making specs accessible across projects. Managed via MCP connector.
+When building a project, the planning skills generate documents (product spec, architecture blueprint, implementation spec, test plan, tickets). These should be stored and retrieved through a dedicated document store via MCP rather than living as files in the project repo. Skills write documents to the store as they produce them, and read from it when they need context — the ticket-implementer pulls the implementation spec, the code-reviewer pulls the ticket, the issue-triage pulls the architecture blueprint, etc. Keeps the repo focused on code.
 
 ### Output Structure Review
 Audit the file and folder structure that skills produce to ensure generated artifacts land in clean, consistent directories across projects.

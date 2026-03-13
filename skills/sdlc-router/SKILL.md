@@ -54,6 +54,8 @@ The input to the router is one of:
 
 **Change request** — A specific modification ("change the database from SQLite to PostgreSQL", "add a new API endpoint", "update the deployment to use ECS"). This might only affect one or two phases.
 
+**Triage output** — A change request produced by the issue-triage skill after investigating a production problem. Triage output is pre-classified: it tells you whether the issue is a spec gap (missing/wrong requirement) or an architecture gap (design can't support the needed behavior). The triage report includes the root cause analysis and a structured change request. Treat triage output as a high-confidence change request — the investigation has already been done, so focus on which phases need to run rather than re-diagnosing the problem. Note: if the triage classified the issue as a code bug, it routes directly to the ticket-implementer and skips the router entirely.
+
 Read the input carefully. Identify:
 - What is being added, changed, or removed?
 - Which existing documents does this affect?

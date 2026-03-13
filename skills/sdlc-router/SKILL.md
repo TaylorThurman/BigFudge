@@ -124,7 +124,7 @@ When the chain completes, provide a summary:
 - Which phases were run and which were skipped (with reasoning)
 - What documents were created or updated (with version numbers)
 - Any open questions or decisions that were deferred
-- What the next steps are — specifically: tickets are ready for the **ticket-implementer** skill, which picks up one ticket at a time, writes the code and tests, and creates a PR. After each implementation, the **code-reviewer** skill reviews the PR before merge. The implementation cycle is: pick a ticket → implement → review → merge → repeat, following dependency order in TRACKER.md.
+- What the next steps are — specifically: tickets are ready for the **implementation-loop** skill, which autonomously picks up tickets in dependency order, runs the **ticket-implementer** and **code-reviewer** for each, and keeps going until everything is built or a blocker is hit. Alternatively, tickets can be implemented one at a time by invoking the ticket-implementer and code-reviewer manually.
 
 ---
 

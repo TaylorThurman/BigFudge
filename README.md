@@ -135,3 +135,25 @@ issue-triage
 1. **New project:** Tell the sdlc-router what you want to build. It runs the planning chain and produces tickets.
 2. **Build it:** Run the implementation-loop. It works through tickets automatically.
 3. **Something breaks:** Describe the problem to issue-triage. It figures out where the fix belongs.
+
+---
+
+## Roadmap
+
+### PM Board Integration (MCP)
+Connect ticket tracking to an external board (ClickUp, Linear, Jira) so tickets live in a proper PM tool instead of markdown files. The tickets skill would create items on the board, the implementation-loop would read status from it, and the issue-triage would create bug tickets there. Managed via MCP connector.
+
+### Document Store (MCP)
+Move SDLC documents (product spec, architecture blueprint, implementation spec, test plan) out of the project repo and into a dedicated document store. Keeps the repo focused on code while making specs accessible across projects. Managed via MCP connector.
+
+### Scheduled Implementation Loop
+Run the implementation-loop as a cron job that periodically checks TRACKER.md for ready tickets and builds them automatically. Removes the need to manually trigger the loop after planning completes.
+
+### Trading Strategy Research Chain
+An upstream chain that researches, backtests, and validates trading strategies before feeding approved strategies into the sdlc-router as structured requirements. Closes the loop from "research idea" to "deployed strategy."
+
+### Skill Packaging and Distribution
+Package the skill chain for sharing and installation. Make it possible to install the full SDLC chain into a new environment with a single command.
+
+### Output Structure Review
+Audit the file and folder structure that skills produce to ensure generated artifacts land in clean, consistent directories across projects.

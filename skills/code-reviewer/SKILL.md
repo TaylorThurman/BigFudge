@@ -339,9 +339,9 @@ If the PR exists on GitHub and `gh` CLI is available:
 
 If `gh` is not available or the PR doesn't exist on GitHub, skip this step. The review report file is the primary output.
 
-### 5.3 Commit the Review Report
+### 5.3 Save the Review Report
 
-Commit the review report to the feature branch so it's part of the PR history:
+**When running standalone** (not inside the implementation-loop): commit the review report to the feature branch so it's part of the PR history:
 
 ```bash
 git add reviews/
@@ -350,6 +350,8 @@ git commit -m "[T-XXX] Add code review report
 Verdict: [APPROVE/REQUEST CHANGES/BLOCKED]
 Findings: [count] must-fix, [count] should-fix, [count] nits"
 ```
+
+**When running inside the implementation-loop**: do NOT commit to the feature branch. Write the review report file but leave it uncommitted. The orchestrator manages all branch operations to prevent conflicts between parallel agents. Report the review verdict and file path back to the orchestrator.
 
 ---
 

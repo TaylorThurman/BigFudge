@@ -121,12 +121,14 @@ issue-triage
 
 ## Skill Count
 
-| Phase | Skills | Purpose |
-|-------|--------|---------|
-| Plan  | 6      | Requirements → Design → Tickets |
-| Build | 3      | Tickets → Code → Reviewed PRs |
-| Fix   | 1      | Production issues → Right fix path |
+| Phase | Skills | Names |
+|-------|--------|-------|
+| Plan  | 6      | sdlc-router, product-spec, architecture-blueprint, implementation-spec, tickets, test-plan |
+| Build | 3      | implementation-loop, ticket-implementer, code-reviewer |
+| Fix   | 1      | issue-triage |
 | **Total** | **10** | |
+
+**TRACKER Status Lifecycle:** `Todo → In Progress → In Review → Done` (and `Blocked`). Tickets move to `In Review` when code is complete and a PR is created. They move to `Done` only after the project owner approves and merges the PR. Dependencies are considered met at `In Review` — agents don't wait for human approval to start dependent work.
 
 ---
 

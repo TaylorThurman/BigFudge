@@ -1,0 +1,44 @@
+{
+  "skill_name": "implementation-loop",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I have a project with 5 tickets ready to build. T-001 has no dependencies and is the foundation. T-002, T-003, and T-004 all depend on T-001. T-005 depends on T-002. The repo is at {repo_path}. Start the implementation loop and work through the tickets.",
+      "expected_output": "Correctly identifies T-001 as the only initially ready ticket, implements it first, then recognizes T-002/T-003/T-004 as parallel candidates, spawns up to 3 agents, and finally picks up T-005 after T-002 is In Review. Uses In Review status (not Done) for completed tickets. Creates PRs but does not auto-merge into main. Produces an implementation report.",
+      "files": [],
+      "expectations": [
+        "T-001 is implemented first before any other ticket",
+        "T-002, T-003, and T-004 are identified as ready after T-001 completes",
+        "TRACKER uses In Review status for completed tickets, not Done",
+        "No code is auto-merged into main — PRs are created instead",
+        "T-005 is picked up after T-002 reaches In Review",
+        "An implementation report is produced at the end"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "I need to continue an implementation loop from a previous run. Some tickets are already done, one is blocked. The repo is at {repo_path}. Pick up where we left off and implement whatever is ready.",
+      "expected_output": "Correctly reads the mixed-state TRACKER, skips Done/In Review/Blocked tickets, identifies which Todo tickets have their dependencies met (including In Review as met), implements only what's ready, and reports what's still blocked and why.",
+      "files": [],
+      "expectations": [
+        "Does not re-implement tickets that are Done or In Review",
+        "Recognizes In Review dependencies as met (not just Done)",
+        "Does not attempt to implement Blocked tickets",
+        "Correctly identifies which Todo tickets are ready based on dependency status",
+        "Reports what remains blocked and why at the end"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "I have a strictly sequential project — each ticket depends on the previous one. T-001 → T-002 → T-003. The repo is at {repo_path}. Start the implementation loop.",
+      "expected_output": "Implements tickets one at a time in order. Does not attempt to parallelize since each ticket depends on the previous. Uses In Review status. Creates PRs without auto-merging. Concurrency is effectively 1 for this project.",
+      "files": [],
+      "expectations": [
+        "Implements T-001 first, then T-002, then T-003 in strict order",
+        "Does not attempt to run multiple tickets in parallel",
+        "Each ticket reaches In Review before the next one starts",
+        "Creates PRs without auto-merging into main"
+      ]
+    }
+  ]
+}

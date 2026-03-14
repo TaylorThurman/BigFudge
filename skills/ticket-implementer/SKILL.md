@@ -191,7 +191,9 @@ Fix any issues. Don't submit code with lint warnings.
 
 ### 5.1 Update TRACKER.md
 
-Change the ticket's status from `Todo` (or `In Progress`) to `In Review` in TRACKER.md. The ticket moves to `Done` only after the project owner approves and merges the PR. If the tracker uses different conventions, match its terminology — but the intent is the same: the code is complete and awaiting human approval.
+**When running standalone** (not inside the implementation-loop): change the ticket's status from `Todo` (or `In Progress`) to `In Review` in TRACKER.md. The ticket moves to `Done` only after the project owner approves and merges the PR.
+
+**When running inside the implementation-loop**: do NOT update TRACKER.md. The orchestrator owns all TRACKER writes to prevent race conditions between parallel agents. Just report your result back to the orchestrator and it will handle the status update.
 
 ### 5.2 Create a Feature Branch and Commit
 

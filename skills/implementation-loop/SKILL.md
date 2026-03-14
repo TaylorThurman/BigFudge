@@ -177,7 +177,7 @@ As each agent completes (not waiting for all agents), the orchestrator immediate
 
 ---
 
-## Merge and Rebase
+## Merge and Conflict Resolution
 
 This is how the orchestrator handles the fact that multiple agents branch from the same base and may modify overlapping files.
 
@@ -187,23 +187,42 @@ Agents complete at different times. The orchestrator merges branches in completi
 
 ### When a branch has conflicts
 
-After Agent 1's branch merges into main, Agent 2's branch (which was based on the pre-merge main) may have conflicts. The orchestrator handles this:
+After Agent 1's branch merges into main, Agent 2's branch (which was based on the pre-merge main) may not merge cleanly. The orchestrator handles this:
 
-1. **Attempt rebase.** Run `git rebase main` on Agent 2's branch. This replays Agent 2's changes on top of the updated main (which now includes Agent 1's work).
+1. **Attempt rebase.** Run `git rebase main` on Agent 2's branch. This replays Agent 2's changes on top of the updated main (which now includes Agent 1's work). Both sets of changes are preserved — Agent 1's work is the new base, Agent 2's commits are replayed on top.
 
-2. **If rebase succeeds cleanly:** Run the test suite on the rebased branch. If tests pass, merge it. If tests fail, the rebase introduced a logical conflict — mark the ticket for human review.
+2. **If rebase succeeds cleanly:** Run the test suite on the rebased branch. If tests pass, merge it. If tests fail, a logical conflict exists (the two tickets interact in a way that breaks behavior) — proceed to the conflict resolution agent.
 
-3. **If rebase has conflicts:** Attempt automatic resolution for simple conflicts (e.g., both agents added imports to the same file — combine them). Use `git rebase --continue` after resolving each conflict.
+3. **If rebase has line-level conflicts:** Don't attempt auto-resolution. Proceed to the conflict resolution agent.
 
-4. **If auto-resolution fails:** Mark the ticket as needing human resolution. The branch is left in its pre-rebase state so the human can resolve conflicts manually. The ticket goes to `Blocked` in TRACKER with a note: "Merge conflict with [other ticket] — needs manual resolution."
+### Conflict Resolution Agent
+
+When a rebase fails (line conflicts) or succeeds but tests break (logical conflict), the orchestrator spawns a dedicated **conflict resolution agent**. This agent has full context to make an informed decision about how to combine the two tickets' work.
+
+The conflict resolution agent receives:
+- Both ticket files (the two tickets whose changes conflict)
+- The implementation spec (coding conventions and module interfaces)
+- The review reports from both tickets (what was implemented and why)
+- The conflict diff (which files and lines are in conflict)
+- The test failure output (if it's a logical conflict with a clean rebase)
+
+The agent's job:
+
+1. **Understand both tickets' intent.** Read both tickets and their review reports to understand what each change was trying to accomplish.
+
+2. **Resolve the conflict.** For line-level conflicts: examine the conflicting sections, understand what each agent wrote and why, and produce a merged version that satisfies both tickets' acceptance criteria. For logical conflicts: identify the interaction between the two changes and modify the code so both tickets' behavior works correctly together.
+
+3. **Run tests.** After resolving, run the full test suite. Both tickets' tests must pass.
+
+4. **If resolution succeeds:** Commit the resolved version on Agent 2's branch. The orchestrator merges it into main.
+
+5. **If resolution fails:** The agent reports that it couldn't reconcile the two changes. The ticket is marked `Blocked` in TRACKER with a note: "Conflict with [other ticket] — needs human resolution." The branch is left in its pre-rebase state so a human can resolve it manually.
+
+One attempt only. If the conflict resolution agent can't fix it, a human needs to look. Don't loop on conflict resolution — it risks making things worse.
 
 ### Why rebase instead of merge commits
 
 Rebase produces a clean linear history. Each ticket's changes appear as a coherent set of commits on main, not interleaved with merge commits. This makes it easier to understand what each ticket changed and to revert if needed.
-
-### Worst case
-
-If all 3 agents modify the same file and conflicts cascade, the first merge goes clean, the second might need a simple rebase, and the third might need human help. This is fine — the orchestrator got 2 out of 3 merged automatically, which is better than running everything sequentially.
 
 ---
 
@@ -320,4 +339,4 @@ If the loop is interrupted mid-run, the state is recoverable:
 
 ### When a rebase changes behavior without conflict
 
-A rebase can succeed (no git conflicts) but still break things if Agent 1's changes affect Agent 2's logic. This is why the orchestrator runs tests after every rebase. If tests fail after a clean rebase, the ticket is marked for human review — the code needs someone to understand the interaction between the two changes.
+A rebase can succeed (no git conflicts) but still break things if Agent 1's changes affect Agent 2's logic. This is why the orchestrator runs tests after every rebase. If tests fail after a clean rebase, the conflict resolution agent is spawned — it has both tickets' context and can understand the interaction between the two changes to fix the logical conflict.

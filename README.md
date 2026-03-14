@@ -134,9 +134,23 @@ issue-triage
 
 ## Getting Started
 
-1. **New project:** Tell the sdlc-router what you want to build. It runs the planning chain and produces tickets.
-2. **Build it:** Run the implementation-loop. It works through tickets automatically.
-3. **Something breaks:** Describe the problem to issue-triage. It figures out where the fix belongs.
+Each phase is triggered by a specific phrase. Use these exact phrases to avoid ambiguity:
+
+| Phase | What to say | What happens |
+|-------|------------|--------------|
+| **Plan** | "Plan this project — [your requirements]" | Runs the planning chain, produces specs and tickets |
+| **Build** | "Start the implementation loop" | Picks up tickets, implements them in parallel, creates PRs |
+| **Fix** | "Something is broken — [describe the issue]" | Triages the problem, routes to the right fix path |
+
+Other useful phrases:
+
+| Action | What to say |
+|--------|------------|
+| Implement a single ticket | "Implement this ticket — T-001" |
+| Review a PR | "Review this PR" or "Review T-004" |
+| Resume a previous build | "Start the implementation loop" (it reads TRACKER and picks up where it left off) |
+
+Each phase runs independently. Planning does not auto-start building. Building does not auto-start after planning. You control when each phase begins.
 
 ---
 

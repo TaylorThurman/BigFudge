@@ -48,17 +48,17 @@ implementation-loop
     └── code-reviewer         Review before merge
 ```
 
-**Start here:** Run the `implementation-loop` after planning is done. It reads TRACKER.md, finds tickets whose dependencies are all complete, and for each one: implements it, reviews it, and moves to the next. It keeps going until everything is built or it hits a blocker.
+**Start here:** Run the `implementation-loop` after planning is done. It reads TRACKER.md, finds all tickets whose dependencies are complete, and works up to 3 in parallel — each one gets implemented, reviewed, and merged. As tickets complete, newly unblocked tickets become available for the next batch. It keeps going until everything is built or it hits a blocker.
 
 **Skills:**
 
 | Skill | What it does | When it runs |
 |-------|-------------|--------------|
-| `implementation-loop` | Picks up tickets in dependency order, orchestrates implement→review | After planning produces tickets |
-| `ticket-implementer` | Reads a ticket, writes code + tests, updates TRACKER, creates a PR | Once per ticket |
+| `implementation-loop` | Finds ready tickets, spawns up to 3 parallel agents, updates TRACKER centrally | After planning produces tickets |
+| `ticket-implementer` | Reads a ticket, writes code + tests, creates a feature branch and PR | Once per ticket (can run in parallel) |
 | `code-reviewer` | Reviews the PR across 6 dimensions, produces verdict (approve/request changes/blocked) | After each implementation |
 
-The loop retries once on "request changes." If it fails twice, it stops and asks for human help.
+Each agent retries once on "request changes." If it fails twice, that ticket is marked blocked and the loop continues with other available tickets.
 
 ---
 

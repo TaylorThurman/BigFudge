@@ -72,7 +72,7 @@ Read the product documentation and find the requirement(s) that cover the report
 - **Is the spec ambiguous?** If the requirement could be interpreted multiple ways, the code might be following a valid interpretation that differs from the user's expectation.
 - **Is the spec contradictory?** Sometimes two requirements (possibly in different feature docs) conflict, and the code implements one at the expense of the other.
 
-Record what the spec says about this behavior. If no feature doc addresses it at all, that's already a classification signal.
+Record what the spec says about this behavior, referencing the specific requirement IDs (e.g., "FR-003 from features/risk-alerts.md says..."). If no feature doc addresses it at all, that's already a classification signal.
 
 ### 2.2 Check the Architecture
 
@@ -228,7 +228,7 @@ Always produce a written report, regardless of classification.
 ## Investigation
 
 ### Spec Check
-[What the spec says about this behavior. Quote the relevant requirement if it exists.]
+[What the spec says about this behavior. Reference the specific requirement ID and feature doc (e.g., "FR-003 from features/risk-alerts.md states..."). If no feature doc covers this, state that explicitly.]
 
 ### Architecture Check
 [Whether the architecture supports the expected behavior.]

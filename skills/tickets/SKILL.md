@@ -62,9 +62,10 @@ Before generating tickets, gather as much context as possible:
 
 1. **Architecture Blueprint** (strongly preferred) — Provides the component architecture, data flow, state machines, and design decisions.
 2. **Implementation Spec** (strongly preferred) — Provides module interfaces, code structure, conventions, and dependencies.
-3. **Conversation context** — If neither document exists, gather enough from the conversation to decompose the work. Suggest the user create upstream documents first for best results.
+3. **Product Documentation** (for traceability) — Read FEATURES.md to identify which features are in scope, then read the relevant feature docs in features/ for their requirements (FR-XXX format). Each ticket should trace back to the specific requirements it delivers.
+4. **Conversation context** — If upstream documents don't exist, gather enough from the conversation to decompose the work. Suggest the user create upstream documents first for best results.
 
-If both documents exist, read them completely before writing any tickets.
+If upstream documents exist, read them completely before writing any tickets.
 
 ---
 
@@ -77,6 +78,7 @@ Every ticket follows this format:
 
 **Slice:** [Which vertical slice this belongs to — e.g., "Slice 0: Foundation" or "Slice 3: Preference Learning"]
 **Depends On:** [T-XXX, T-YYY, or "None — can start immediately"]
+**Requirements:** [FR-XXX from features/feature-name.md — the specific requirements this ticket delivers, or "Foundation — no direct feature requirement"]
 **Estimated Scope:** [Small | Medium | Large — relative to a single coding session]
 
 ### Description

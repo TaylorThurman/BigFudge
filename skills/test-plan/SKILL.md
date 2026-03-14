@@ -157,7 +157,7 @@ If certain tests require specific environment setup (API keys, network access, r
 
 ### 5. Acceptance Criteria & Thresholds
 
-The numeric and observable criteria that determine whether the system passes. Map these back to product spec requirements where possible.
+The numeric and observable criteria that determine whether the system passes. Map these back to specific requirements in the feature docs (e.g., "FR-003 from features/risk-alerts.md").
 
 For quantitative systems (trading, ML, analytics):
 ```markdown
@@ -253,7 +253,7 @@ For subsequent versions, use the standard Added / Changed / Removed / Clarified 
 ## Writing Guidelines
 
 - **Be specific about commands.** A developer should be able to copy-paste test commands and run them. Include flags, paths, and any required environment setup.
-- **Connect tests to requirements.** Where possible, reference which product spec requirement or architecture component each test layer validates. This traceability makes it clear why each test exists.
+- **Connect tests to requirements.** Where possible, reference which feature doc requirement (e.g., "FR-003 from features/risk-alerts.md") or architecture component each test layer validates. This traceability makes it clear why each test exists.
 - **Define "pass" precisely.** For every threshold, specify the exact metric, the exact threshold, and the exact data source. Ambiguous pass/fail criteria lead to arguments and skipped tests.
 - **Acknowledge what's not tested.** Every system has gaps in test coverage. It's better to document them explicitly than to pretend they don't exist.
 

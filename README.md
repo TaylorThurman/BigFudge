@@ -136,11 +136,12 @@ issue-triage
 
 Each phase is triggered by a specific phrase. Use these exact phrases to avoid ambiguity:
 
-| Phase | What to say | What happens |
-|-------|------------|--------------|
-| **Plan** | "Plan this project — [your requirements]" | Runs the planning chain, produces specs and tickets |
-| **Build** | "Start the implementation loop" | Picks up tickets, implements them in parallel, creates PRs |
-| **Fix** | "Something is broken — [describe the issue]" | Triages the problem, routes to the right fix path |
+| Phase     | What to say                                  | What happens                                               |
+| --------- | -------------------------------------------- | ---------------------------------------------------------- |
+| **Plan (new)** | "Plan this project — [your requirements]" | Runs the full planning chain, produces specs and tickets |
+| **Plan (update)** | "New requirements — [what changed]" | Reads existing docs, re-runs only the planning steps that need updating |
+| **Build** | "Start the implementation loop"              | Picks up tickets, implements them in parallel, creates PRs |
+| **Fix**   | "Something is broken — [describe the issue]" | Triages the problem, routes to the right fix path          |
 
 Other useful phrases:
 

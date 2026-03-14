@@ -48,17 +48,17 @@ implementation-loop
     └── code-reviewer         Review before merge
 ```
 
-**Start here:** Run the `implementation-loop` after planning is done. It reads TRACKER.md, finds all tickets whose dependencies are complete, and spawns up to 3 agents working in parallel. As each agent finishes, its branch is merged into main immediately and the TRACKER is updated — which may unblock new tickets that get picked up right away. If two branches conflict, a conflict resolution agent reads both tickets' context and resolves the merge intelligently. The loop keeps going until everything is built or it hits a blocker.
+**Start here:** Run the `implementation-loop` after planning is done. It reads TRACKER.md, finds all tickets whose dependencies are complete (`In Review` or `Done`), and spawns up to 3 agents working in parallel. As each agent finishes, main is merged into the feature branch, tests run, and a PR is created — but never auto-merged. The project owner reviews and approves every PR before code enters main. When a PR is created the ticket moves to `In Review`, which unblocks dependent tickets so agents keep working without waiting for human approval. If two branches conflict during the merge, a conflict resolution agent reads both tickets' context and resolves it intelligently. The loop keeps going until all tickets have PRs up or it hits a blocker.
 
 **Skills:**
 
 | Skill | What it does | When it runs |
 |-------|-------------|--------------|
-| `implementation-loop` | Orchestrates parallel agents, merges branches, resolves conflicts, updates TRACKER | After planning produces tickets |
+| `implementation-loop` | Orchestrates parallel agents, creates PRs, resolves conflicts, updates TRACKER | After planning produces tickets |
 | `ticket-implementer` | Reads a ticket, writes code + tests, creates a feature branch and PR | Once per ticket (up to 3 in parallel) |
 | `code-reviewer` | Reviews the PR across 6 dimensions, produces verdict (approve/request changes/blocked) | After each implementation |
 
-Each agent retries once on "request changes." If it fails twice, that ticket is marked blocked and the loop continues with other available tickets. Merge conflicts between parallel branches are resolved by a dedicated agent that understands both tickets' intent — only unresolvable conflicts escalate to a human.
+Each agent retries once on "request changes." If it fails twice, that ticket is marked blocked and the loop continues with other available tickets. Merge conflicts between parallel branches are resolved by a dedicated agent that understands both tickets' intent — only unresolvable conflicts escalate to the project owner.
 
 ---
 

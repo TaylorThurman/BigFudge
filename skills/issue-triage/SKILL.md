@@ -67,12 +67,12 @@ This is a systematic top-down investigation. Start with what the system is suppo
 
 ### 2.1 Check the Spec
 
-Read the product spec and find the requirement(s) that cover the reported behavior. Ask:
-- **Is the expected behavior specified?** If the user expects something the spec never defined, this is a spec gap, not a bug.
+Read the product documentation and find the requirement(s) that cover the reported behavior. Start with FEATURES.md to identify which feature is involved, then read the relevant feature doc in features/ for its requirements and acceptance criteria. Also check PRODUCT.md for project-level constraints that might apply. Ask:
+- **Is the expected behavior specified?** If the user expects something that no feature doc defines, this is a spec gap, not a bug.
 - **Is the spec ambiguous?** If the requirement could be interpreted multiple ways, the code might be following a valid interpretation that differs from the user's expectation.
-- **Is the spec contradictory?** Sometimes two requirements conflict, and the code implements one at the expense of the other.
+- **Is the spec contradictory?** Sometimes two requirements (possibly in different feature docs) conflict, and the code implements one at the expense of the other.
 
-Record what the spec says about this behavior. If the spec doesn't address it at all, that's already a classification signal.
+Record what the spec says about this behavior. If no feature doc addresses it at all, that's already a classification signal.
 
 ### 2.2 Check the Architecture
 

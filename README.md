@@ -29,7 +29,7 @@ sdlc-router
 | Skill | What it produces | When it runs |
 |-------|-----------------|--------------|
 | `sdlc-router` | Execution plan + orchestration | Always — it decides what else runs |
-| `product-spec` | Requirements, constraints, success criteria | New project or new feature |
+| `product-spec` | PRODUCT.md, FEATURES.md, features/*.md | New project or new feature |
 | `architecture-blueprint` | Components, data flow, infrastructure design | New system design or design changes |
 | `implementation-spec` | Code conventions, module interfaces, CLAUDE.md | New codebase patterns or interface changes |
 | `tickets` | TRACKER.md + individual ticket files per slice | Almost always — work needs to be tracked |
@@ -129,6 +129,27 @@ issue-triage
 | **Total** | **10** | |
 
 **TRACKER Status Lifecycle:** `Todo → In Progress → In Review → Done` (and `Blocked`). Tickets move to `In Review` when code is complete and a PR is created. They move to `Done` only after the project owner approves and merges the PR. Dependencies are considered met at `In Review` — agents don't wait for human approval to start dependent work.
+
+---
+
+## Product Documentation Structure
+
+The product-spec skill produces documentation in a feature-per-doc architecture to keep things manageable as the project grows:
+
+```
+PRODUCT.md           ← Project-level context (vision, constraints, users, success criteria)
+FEATURES.md          ← Index of all features with status, priority, and links
+features/
+  user-auth.md       ← Self-contained feature doc with requirements, workflows, scope
+  portfolio-view.md
+  risk-alerts.md
+```
+
+**PRODUCT.md** holds everything that applies across the entire project — problem statement, target users, constraints, quality attributes, and overall success criteria. Written once, updated rarely.
+
+**FEATURES.md** is the index. A table listing every feature, its status (Draft / Review / Approved / Implemented / Deprecated), priority (MoSCoW), and a link to its doc.
+
+**features/*.md** are individual feature docs, each self-contained with its own requirements (FR-XXX format), user workflows, acceptance criteria, and scope. Adding a new feature means adding a new file — not editing existing ones.
 
 ---
 

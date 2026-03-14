@@ -237,7 +237,7 @@ The tracker is the single file a human reads for the big picture. It contains th
 - [Note any assumptions or gaps]
 ```
 
-Status values: **Todo** | **In Progress** | **Done**
+Status values: **Todo** | **In Progress** | **In Review** | **Done** | **Blocked**
 
 The Slice Overview table lets the user see at a glance which features are complete. The Ticket Summary table provides the detailed view. Both are updated as work progresses.
 

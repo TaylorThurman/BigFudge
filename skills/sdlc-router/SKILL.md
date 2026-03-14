@@ -27,11 +27,15 @@ Each phase has its own skill. The router invokes them as needed — it does not 
 
 ### Step 1: Assess Current State
 
-Read the project directory to understand what exists. Look for files matching these patterns:
+Read the project directory to understand what exists. Look for:
 
 ```
 project-directory/
-├── *-product-spec-v*.md
+├── PRODUCT.md                    ← Project-level context
+├── FEATURES.md                   ← Feature index
+├── features/                     ← Individual feature docs
+│   ├── user-auth.md
+│   └── portfolio-view.md
 ├── *-architecture-blueprint-v*.md
 ├── *-implementation-spec-v*.md
 ├── *-tickets/
@@ -40,7 +44,7 @@ project-directory/
 └── *-test-plan-v*.md
 ```
 
-For each document found, note its version number and read it. The router needs to understand the current state of the project to make good decisions about what needs to change.
+For each document found, note its version number and read it. For product documentation specifically, read FEATURES.md first to understand the feature landscape, then read individual feature docs as needed.
 
 If no project directory exists or it's empty, this is a greenfield project — all phases will likely be needed.
 
@@ -60,6 +64,8 @@ Read the input carefully. Identify:
 - What is being added, changed, or removed?
 - Which existing documents does this affect?
 - Is this a new capability or a modification to an existing one?
+
+**Feature detection:** When the input describes a feature, check FEATURES.md to see if it already exists. If the feature exists, this is an update — read the existing feature doc and modify it. If it doesn't exist, this is a new feature — create a new feature doc and add it to FEATURES.md. If you're unsure whether the input maps to an existing feature (e.g., "improve the login experience" might be an update to user-auth or a new feature), ask the user for clarification rather than guessing.
 
 ### Step 3: Determine the Execution Plan
 
@@ -168,8 +174,8 @@ When input comes from an automated upstream chain (like a trading strategy resea
 The router itself doesn't produce files — it invokes other skills that produce files. The router's output is the execution summary described in Step 5, plus any escalation questions if they arise.
 
 When invoking skills, pass the relevant context:
-- For product-spec: the new requirements and the existing product spec (if updating)
-- For architecture-blueprint: the updated product spec and the existing blueprint (if updating)
+- For product-spec: the new requirements, PRODUCT.md, FEATURES.md, and the relevant feature doc(s) if updating
+- For architecture-blueprint: the updated product/feature docs and the existing blueprint (if updating)
 - For implementation-spec: the updated architecture (or existing if skipped) and existing implementation spec
 - For tickets: the architecture and implementation spec (current versions)
 - For test-plan: all upstream documents (current versions)

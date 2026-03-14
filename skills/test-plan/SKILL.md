@@ -24,7 +24,7 @@ This is **Phase 5** of the skill chain:
 5. **Test Plan** (this skill) — How do we validate it?
 
 The test plan draws from all upstream documents:
-- **Product spec** provides the acceptance criteria — the "what success looks like" that tests must verify.
+- **Product documentation** provides the acceptance criteria — the "what success looks like" that tests must verify. This lives across PRODUCT.md (project-level success criteria), FEATURES.md (feature index), and individual feature docs in features/ (per-feature requirements and acceptance criteria).
 - **Architecture blueprint** provides the component boundaries and data flows — the seams where integration tests live.
 - **Implementation spec** provides the module interfaces and build phases — the contracts that unit tests verify.
 
@@ -49,7 +49,7 @@ The test plan draws from all upstream documents:
 
 ## Core Principles
 
-**Every requirement is testable.** For each requirement in the product spec, there should be at least one test that verifies it's met. If a requirement can't be tested, it's either too vague (refine it) or it's aspirational (acknowledge it as such).
+**Every requirement is testable.** For each requirement in the feature docs (features/*.md), there should be at least one test that verifies it's met. If a requirement can't be tested, it's either too vague (refine it) or it's aspirational (acknowledge it as such).
 
 **Test at the right level.** Unit tests for logic, integration tests for component interactions, end-to-end tests for user workflows. Testing everything at the E2E level is slow and brittle. Testing everything at the unit level misses integration bugs. The test plan defines where each type of validation belongs.
 

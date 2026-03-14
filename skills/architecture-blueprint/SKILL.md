@@ -23,7 +23,7 @@ This is **Phase 2** of the skill chain:
 4. **Tickets** — What are the individual units of work?
 5. **Test Plan** — How do we validate it?
 
-The blueprint consumes the product spec and answers: given these requirements and constraints, how should the system be structured? Every design decision should trace back to a requirement in the product spec. The blueprint then feeds the implementation spec (which details how to build what's designed here), tickets (which break the work into deliverable slices), and the test plan (which validates the design works).
+The blueprint consumes the product documentation (PRODUCT.md for project-level context, FEATURES.md for the feature index, and individual feature docs in features/ for requirements) and answers: given these requirements and constraints, how should the system be structured? Every design decision should trace back to a requirement in a feature doc. The blueprint then feeds the implementation spec (which details how to build what's designed here), tickets (which break the work into deliverable slices), and the test plan (which validates the design works).
 
 ### What Belongs Here vs. Other Skills
 
@@ -62,7 +62,7 @@ When writing the blueprint, you will naturally touch on topics that belong to ot
 
 **Diagrams are mandatory and always use Mermaid.** Every blueprint includes Mermaid diagrams for visual clarity. All diagrams must use Mermaid syntax — no ASCII art, no plaintext boxes, no alternative formats. At minimum: a system/component diagram and a data flow diagram. Additional diagrams (state machines, sequence diagrams, network topology) should be included wherever they add understanding. Even for simple systems or sparse inputs, the Mermaid requirement is non-negotiable.
 
-**Trace to requirements.** When a product spec exists, design decisions should reference the requirements they satisfy. This traceability ensures nothing is designed without a reason and no requirement is left unaddressed.
+**Trace to requirements.** When product documentation exists, design decisions should reference the requirements they satisfy (e.g., "FR-003 from features/risk-alerts.md"). This traceability ensures nothing is designed without a reason and no requirement is left unaddressed.
 
 ---
 
@@ -83,7 +83,7 @@ Before writing anything, determine whether a previous blueprint exists. Check fo
 
 ### If no previous blueprint exists:
 
-Gather as much information as possible from the conversation before writing. If a product spec exists, use it as the primary input. Ask clarifying questions if major sections would be left empty.
+Gather as much information as possible from the conversation before writing. If product documentation exists, use it as the primary input — read PRODUCT.md for project-level context (constraints, users, quality attributes), then FEATURES.md for the feature index, then the individual feature docs in features/ for the specific requirements and acceptance criteria that the architecture must satisfy. Ask clarifying questions if major sections would be left empty.
 
 ---
 

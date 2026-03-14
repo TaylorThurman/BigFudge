@@ -30,6 +30,56 @@ The product spec feeds downstream SDLC phases — every design decision in the a
 
 ---
 
+## Document Structure
+
+Product documentation is split across three layers to keep things manageable as the project grows:
+
+```
+PRODUCT.md           ← Project-level context (vision, constraints, users, success criteria)
+FEATURES.md          ← Index of all features with status and links
+features/
+  user-auth.md       ← Self-contained feature doc
+  portfolio-view.md
+  risk-alerts.md
+```
+
+**PRODUCT.md** holds everything that applies across the entire project — the problem statement, target users, constraints, assumptions, and overall success criteria. This is written once and updated rarely. It does NOT contain feature-specific requirements.
+
+**FEATURES.md** is the index. A simple table listing every feature, its status, priority, and a link to its doc. This is the first place anyone looks to understand what the project does.
+
+**features/*.md** are individual feature docs. Each one is self-contained with its own requirements, workflows, acceptance criteria, and scope. When you add a new feature, you add a new file — you don't edit existing feature docs unless those features are changing.
+
+This structure matters because it prevents monolithic specs from becoming unmanageable. A project with 20 features should have 20 small, focused docs — not one 50-page document that nobody wants to read.
+
+---
+
+## When to Create What
+
+**New project (no existing docs):**
+1. Conduct the interview (see below)
+2. Create PRODUCT.md with project-level context
+3. Create FEATURES.md index
+4. Create a feature doc for each feature identified in the interview
+
+**New feature (project already exists):**
+1. Read PRODUCT.md for project context and FEATURES.md to understand what exists
+2. Check if the requested feature overlaps with an existing one — if unclear, ask the user
+3. Create a new feature doc in features/
+4. Add an entry to FEATURES.md
+
+**Updating an existing feature:**
+1. Read the existing feature doc
+2. Update the requirements, workflows, or scope as needed
+3. Add a changelog entry at the bottom of the feature doc
+4. Update FEATURES.md if the status or priority changed
+
+**Updating project-level context:**
+1. Read PRODUCT.md
+2. Update the relevant section (constraints, users, success criteria, etc.)
+3. Add a changelog entry
+
+---
+
 ## Core Principles
 
 **Clarity over completeness.** A product spec with 10 crystal-clear requirements is more useful than one with 50 vague ones. Every requirement should be specific enough that two people reading it would agree on whether a given implementation satisfies it.
@@ -38,235 +88,168 @@ The product spec feeds downstream SDLC phases — every design decision in the a
 
 **Constraints are requirements too.** Hardware limitations, budget constraints, regulatory requirements, and personal preferences ("I want to operate everything from my phone") are just as important as functional requirements. They shape the solution space and should be captured explicitly.
 
-**Previous specs are sacred.** Same principle as the architecture blueprint — when a prior version exists, every requirement must be accounted for in the new version. Nothing gets silently dropped.
+**One feature, one doc.** Each feature is self-contained. A feature doc should make sense on its own without reading every other feature doc. Cross-references are fine when features interact, but each doc should stand alone.
 
----
-
-## Handling Previous Specs
-
-Before writing, determine whether a previous product spec exists. Check for uploaded files, pasted content, or references to prior versions.
-
-### If a previous spec exists:
-
-1. Read it completely before writing anything new.
-2. Create an inventory of all existing requirements and constraints.
-3. Merge forward — every requirement from the previous version appears in the new version unless the user explicitly removes it.
-4. Generate a Changelog section at the end.
-
-### If no previous spec exists:
-
-Gather as much information as possible from the conversation. The interview phase (below) is especially important for first drafts. Ask clarifying questions rather than making assumptions — the whole point of this document is to eliminate ambiguity.
+**Previous docs are sacred.** When prior versions exist, every requirement must be accounted for in the new version. Nothing gets silently dropped.
 
 ---
 
 ## Interview Phase
 
-Before writing the spec, conduct a structured interview. The goal is to extract everything the user knows about what they want, even things they haven't thought to mention. Tailor the depth of each area to the project.
+Before writing anything, conduct a structured interview. The goal is to extract everything the user knows about what they want, even things they haven't thought to mention. Tailor the depth of each area to the project.
 
 **Problem & Purpose:**
 - What problem does this system solve?
 - Who is it for? (Single user? Team? Customers?)
 - What does success look like? How will you know it's working?
 
-**Functional Requirements:**
-- What should the system do? Walk through the core workflows.
-- What are the inputs and outputs?
-- What decisions does the system make vs. what decisions does a human make?
+**Features:**
+- What should the system do? Walk through the core capabilities.
+- Which features are must-haves vs nice-to-haves?
+- Are any features dependent on other features?
 
 **Constraints & Boundaries:**
 - What hardware/infrastructure is available?
 - What's the budget? (Zero? Limited? Flexible?)
 - Are there regulatory or compliance requirements?
-- What's explicitly out of scope? What should the system NOT do?
+- What's explicitly out of scope?
 
 **User Experience:**
 - How will users interact with the system? (CLI, dashboard, mobile, API, chat?)
-- What's the expected frequency of interaction? (Hourly? Daily? Weekly?)
-- What information does the user need to see? What actions do they need to take?
+- What's the expected frequency of interaction?
+- What information does the user need to see?
 
 **Quality Attributes:**
 - How important is uptime/reliability?
 - What's the acceptable latency for key operations?
 - How important is security? What's the threat model?
-- Does it need to scale? To what degree?
 
 **Dependencies & Integrations:**
 - What external systems does this need to talk to?
-- Are there APIs, brokers, services, or data sources involved?
 - What happens when a dependency is unavailable?
 
 Not every project needs deep answers to all of these. A personal tool has different requirements than an enterprise platform. Read the room and focus on what matters for this specific project.
 
 ---
 
-## Product Spec Structure
+## PRODUCT.md Structure
 
-### Document Header
+This is the project-level document. It holds context that applies to the entire project, not to any single feature.
 
 ```markdown
-# [Project Name] — Product Specification
+# [Project Name] — Product Overview
 
 **Version:** [vN]
 **Date:** [Date]
-**Previous Version:** [version + date, or "N/A — initial draft"]
 **Status:** [Draft | Review | Approved]
-**Author(s):** [Who wrote/revised this]
-```
 
-### Section Order
+## Problem Statement & Vision
 
-1. Problem Statement & Vision
-2. Users & Stakeholders
-3. Functional Requirements
-4. Non-Functional Requirements
-5. Constraints
-6. Scope Boundaries
-7. User Workflows
-8. Success Criteria
-9. Assumptions & Dependencies
-10. Open Questions
-11. Changelog (always included)
+[2-3 paragraphs: what problem this solves, why existing solutions don't work,
+what the end state looks like when this system is working well.]
 
----
+## Users & Stakeholders
 
-## Section Details
+[Who uses this system, their roles, how they interact, what they care about.]
 
-### 1. Problem Statement & Vision
+## Constraints
 
-What problem does this system solve, and what's the vision for how it solves it? This should be 2-3 paragraphs that anyone could read and understand. No jargon. No implementation details. Just the problem and the intended solution at a high level.
+[Hard boundaries grouped by area: infrastructure, integration, operational, budget, regulatory.]
 
-Include: why existing solutions don't work (or why you're building instead of buying), what the end state looks like when this system is working well, and any key insight or approach that makes this system's approach distinctive.
-
-### 2. Users & Stakeholders
-
-Who uses this system and what do they care about? For each user type, describe their role, how they interact with the system, what they need from it, and what would make them frustrated.
-
-For single-user systems, this section is shorter but still valuable — it forces you to articulate what "you as user" actually need day-to-day vs. what sounds cool in theory.
-
-### 3. Functional Requirements
-
-The heart of the spec. Each requirement should be specific, testable, and traceable. Use a consistent format for every requirement — no exceptions:
-
-```markdown
-**FR-001: [Requirement Title]**
-The system shall [specific behavior]. [Additional detail or context if needed.]
-Acceptance: [How do you know this requirement is met? Testable condition.]
-Priority: [Must | Should | Could | Won't]
-```
-
-Priorities use the **MoSCoW method**:
-- **Must** — Non-negotiable for the current version. The system doesn't ship without these.
-- **Should** — Important, expected in the current version, but the system is usable without them.
-- **Could** — Desirable if time and resources allow. Nice improvements, not core.
-- **Won't** — Explicitly not in this version, but acknowledged for future consideration.
-
-Every requirement gets exactly two fields after the description: `Acceptance` and `Priority`. No other fields (no "Rationale" — the description itself should explain the reasoning). This consistency matters because downstream skills and reviewers depend on a predictable structure.
-
-Group related requirements under headings (e.g., "Trading Execution," "Analysis Pipeline," "User Interface"). The groupings should reflect the user's mental model of the system, not the technical architecture.
-
-### 4. Non-Functional Requirements
-
-Quality attributes that apply across the system: performance, reliability, security, usability, maintainability. Use the same format as functional requirements — same two fields (`Acceptance` and `Priority` using MoSCoW), same structure. The only difference is these describe how the system behaves rather than what it does.
-
-Examples: response time targets, uptime expectations, data retention requirements, accessibility needs, auditability requirements.
-
-### 5. Constraints
-
-Hard boundaries that the solution must work within. These are non-negotiable and come from the environment, not from design choices.
-
-Organize constraints by area of concern when the project spans multiple domains. For example, a system with both hardware and integration constraints should group them clearly:
-
-```markdown
-#### Infrastructure Constraints
 **C-001: [Constraint Title]**
 [Description and why it exists.]
 
-#### Integration Constraints
-**C-002: [Constraint Title]**
-[Description and why it exists.]
+## Quality Attributes
 
-#### Operational Constraints
-**C-003: [Constraint Title]**
-[Description and why it exists.]
-```
+[Non-functional requirements that apply across the system: performance,
+reliability, security, uptime, latency targets.]
 
-If a constraint spans multiple areas of concern, note which areas it affects. The groupings help downstream skills (especially architecture and operations) understand which domain each constraint impacts.
+## Success Criteria
 
-Each constraint should explain what it is and why it exists — the "why" helps future readers understand whether the constraint still applies.
+[Measurable or observable criteria that indicate the project is working.
+Specific enough that the product owner can evaluate them.]
 
-### 6. Scope Boundaries
+## Assumptions & Dependencies
 
-Explicitly define what's in scope for the current version. This section prevents scope creep and aligns expectations.
+[What you're assuming to be true. What external factors the system depends on.]
 
-**In Scope:** What this system will do in its current version. This should be a clear summary derived from the functional requirements above.
-
-**Out of Scope:** Only include this subsection if the user has explicitly stated things that are out of scope, or if items were discussed and deliberately excluded during the interview phase. Do not infer or assume things are out of scope — if there's ambiguity about whether something is in or out, capture it in the Open Questions section instead and ask for clarification. The product owner decides scope, not the spec writer.
-
-### 7. User Workflows
-
-Walk through the key user workflows step by step. These are the "day in the life" scenarios that show how the system fits into the user's actual routine.
-
-Every workflow uses exactly this structure — no variations:
-
-```markdown
-#### [Workflow Name]
-**Trigger:** [What initiates this workflow — time of day, event, user action]
-**Steps:**
-1. [Step]
-2. [Step]
-...
-**Expected Outcome:** [What the user sees/has when the workflow completes successfully]
-**What Could Go Wrong:** [Failure scenarios and their consequences]
-```
-
-These four fields (`Trigger`, `Steps`, `Expected Outcome`, `What Could Go Wrong`) are the only fields in a workflow. Don't add other fields like "Failure Modes" or "Recovery" — keep it consistent. The "What Could Go Wrong" field captures both what can fail and the user-visible impact.
-
-These workflows are invaluable for architecture and testing — they define the paths that must work correctly.
-
-### 8. Success Criteria
-
-How will you know the system is working? Define measurable or observable criteria that indicate success. These should be things the product owner can evaluate, not internal metrics.
-
-Good success criteria are specific: "I can approve or reject a trade proposal from my phone in under 30 seconds" is better than "the system should be fast."
-
-### 9. Assumptions & Dependencies
-
-What are you assuming to be true? What external factors does the system depend on? Document these so that if an assumption turns out to be wrong, you know which requirements are affected.
-
-Examples: "Das Trader Pro API will remain available and unchanged," "Exchange API rate limits will stay at current levels," "The Mac M1 will remain powered on 24/7."
-
-### 10. Open Questions
-
-Unresolved decisions or unknowns that need answers before (or during) architecture work. For each: what's the question, who needs to answer it, what's the impact of not answering it, and any deadline.
-
-### 11. Changelog
-
-Always included. For initial drafts, the changelog notes the creation of the document and any key decisions made during the interview phase. For revisions, it documents every change between versions.
-
-```markdown
 ## Changelog
 
 ### v1 — [Date]
-- Initial draft based on [conversation / interview / prior documentation]
-- [Key decisions or assumptions made during drafting]
+- Initial draft
 ```
 
-For revisions:
+---
+
+## FEATURES.md Structure
+
+The feature index. Simple and scannable.
 
 ```markdown
-## Changelog (vN-1 -> vN)
+# Features
 
-### Added
-- [New requirements, constraints, or workflows]
+| Feature | Status | Priority | Doc |
+|---------|--------|----------|-----|
+| User Authentication | Draft | Must | [features/user-auth.md](features/user-auth.md) |
+| Portfolio View | Draft | Must | [features/portfolio-view.md](features/portfolio-view.md) |
+| Risk Alerts | Draft | Should | [features/risk-alerts.md](features/risk-alerts.md) |
+```
 
-### Changed
-- [Modifications to existing requirements, with explanation]
+**Status values:** Draft, Review, Approved, Implemented, Deprecated
+**Priority values:** Must, Should, Could, Won't (MoSCoW)
 
-### Removed
-- [Requirements dropped, with explanation]
+---
 
-### Clarified
-- [Requirements rewritten for clarity without changing intent]
+## Feature Doc Structure
+
+Each feature gets its own file in features/. The filename should be a kebab-case slug of the feature name.
+
+```markdown
+# [Feature Name]
+
+**Priority:** [Must | Should | Could | Won't]
+**Status:** [Draft | Review | Approved | Implemented | Deprecated]
+**Date:** [Date]
+**Related Features:** [Links to other feature docs this interacts with, or "None"]
+
+## Overview
+
+[1-2 paragraphs: what this feature does, why it exists, who benefits from it.]
+
+## Requirements
+
+**FR-001: [Requirement Title]**
+The system shall [specific behavior].
+Acceptance: [Testable condition that proves this requirement is met.]
+Priority: [Must | Should | Could | Won't]
+
+**FR-002: [Requirement Title]**
+...
+
+## Scope
+
+**In Scope:** [What this feature covers in the current version.]
+
+**Out of Scope:** [Only if the user explicitly excluded something. Don't assume.]
+
+## User Workflows
+
+#### [Workflow Name]
+**Trigger:** [What initiates this workflow]
+**Steps:**
+1. [Step]
+2. [Step]
+**Expected Outcome:** [What the user sees when it works]
+**What Could Go Wrong:** [Failure scenarios and impact]
+
+## Open Questions
+
+[Unresolved decisions or unknowns that need answers.]
+
+## Changelog
+
+### v1 — [Date]
+- Initial draft
 ```
 
 ---
@@ -274,17 +257,27 @@ For revisions:
 ## Writing Guidelines
 
 - **Be specific.** "The system should notify the user" is too vague. "The system sends a push notification to the user's phone when a new trade proposal requires approval" is specific enough to build from.
-- **Use the user's language.** If the product owner says "shadow mode," use "shadow mode" — don't rename it to "simulation mode" for the spec. Consistency with how people actually talk about the system prevents confusion.
+- **Use the user's language.** If the product owner says "shadow mode," use "shadow mode" — don't rename it. Consistency with how people talk about the system prevents confusion.
 - **Distinguish requirements from solutions.** "Must support human approval before changes go live" is a requirement. "Use a three-gate pipeline" is a solution. Requirements belong here; solutions belong in the architecture blueprint.
-- **Every requirement should be testable.** If you can't describe how to verify a requirement is met, it's too vague. Refine it until you can.
-- **Include the 'why' for constraints.** A constraint without context becomes confusing when circumstances change. "No new hardware purchases (budget is $0 for infrastructure)" explains itself; "No new hardware purchases" leaves the reader guessing.
+- **Every requirement should be testable.** If you can't describe how to verify a requirement is met, it's too vague.
+- **Include the 'why' for constraints.** A constraint without context becomes confusing when circumstances change.
+- **Keep feature docs independent.** Each feature doc should make sense on its own. Use "Related Features" links when features interact, but don't make one feature doc depend on reading another to understand it.
 
 ---
 
 ## Output
 
-Produce the product spec as a single Markdown file. The filename should follow the pattern:
-`[project-name]-product-spec-v[N].md`
+For a new project, produce:
+1. `PRODUCT.md` — project-level context
+2. `FEATURES.md` — feature index
+3. `features/[feature-name].md` — one doc per feature identified
 
-Save the file and present it to the user.
+For a new feature, produce:
+1. `features/[feature-name].md` — the new feature doc
+2. Updated `FEATURES.md` — add the new entry
 
+For an update, produce:
+1. Updated doc(s) with changelog entries
+2. Updated `FEATURES.md` if status or priority changed
+
+Save all files and present them to the user.

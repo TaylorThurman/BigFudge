@@ -7,7 +7,7 @@ description: "Autonomous implementation loop that picks up tickets from TRACKER.
 
 This skill runs the implementation cycle autonomously. It reads TRACKER.md, finds all tickets that are ready to build (dependencies met, status Todo), and works them in parallel — up to 3 agents implementing tickets simultaneously. As each agent finishes, the orchestrator immediately updates the tracker and checks for newly unblocked work. It keeps going until there's nothing left to pick up.
 
-The loop is the bridge between "planning is done" and "code is shipped." After the SDLC router produces tickets, this skill turns them into merged PRs without manual intervention.
+The loop is the bridge between "planning is done" and "code is ready for review." After the SDLC router produces tickets, this skill turns them into PRs ready for human approval. **No code is merged into main without the project owner approving the PR.** The loop creates PRs — the human decides when they merge.
 
 ## Why This Skill Exists
 
@@ -49,10 +49,12 @@ If any of these are missing, the loop reports what's needed and stops.
                ▼
 ┌──────────────────────────────────────────────┐
 │  As each agent completes:                    │
-│   1. Orchestrator updates TRACKER            │
-│   2. Merge branch into main                  │
-│   3. Check for newly unblocked tickets       │
-│   4. If a slot opened + tickets ready,       │
+│   1. Merge main into feature branch          │
+│   2. Run tests                               │
+│   3. Push branch and create PR               │
+│   4. Update TRACKER (In Review)              │
+│   5. Check for newly unblocked tickets       │
+│   6. If a slot opened + tickets ready,       │
 │      spawn a new agent immediately           │
 └──────────────┬───────────────────────────────┘
                │
@@ -66,7 +68,9 @@ If any of these are missing, the loop reports what's needed and stops.
         Loop back to top
 ```
 
-The key difference from a batch model: the orchestrator doesn't wait for all 3 agents to finish before doing anything. As soon as one agent completes, its ticket gets merged and the tracker gets updated. If that unblocks new tickets, a new agent spawns immediately to fill the open slot.
+The key difference from a batch model: the orchestrator doesn't wait for all 3 agents to finish before doing anything. As soon as one agent completes, it merges main into the feature branch, creates a PR, and updates the tracker. If that unblocks new tickets, a new agent spawns immediately to fill the open slot.
+
+**PRs are never auto-merged.** The project owner reviews and approves every PR before it enters main. The ticket moves from `In Review` to `Done` only after the PR is merged by the human.
 
 ---
 
@@ -76,8 +80,8 @@ The orchestrator is the single point of control. Agents do not update TRACKER.md
 
 **The orchestrator owns:**
 - Reading and writing TRACKER.md (agents never touch it)
-- Merging approved branches into main
-- Rebasing other in-flight branches after a merge
+- Merging main into feature branches to incorporate changes from other agents
+- Pushing branches and creating PRs (PRs are never auto-merged — the human approves)
 - Spawning and tracking agents
 - Deciding when to stop
 
@@ -90,17 +94,34 @@ This separation prevents race conditions. There's one writer for shared state (t
 
 ---
 
+## TRACKER Status Lifecycle
+
+```
+Todo → In Progress → In Review → Done
+                  ↘ Blocked
+```
+
+- **Todo**: Not started, waiting for dependencies.
+- **In Progress**: An agent is actively implementing and reviewing the ticket.
+- **In Review**: Code review passed, PR created, awaiting human approval. The code is complete — it just needs the project owner to review and merge the PR.
+- **Done**: Human approved and merged the PR. Code is on main.
+- **Blocked**: Implementation failed twice, conflict resolution failed, or a blocker was hit.
+
+A ticket's dependencies are considered **met** when they are `In Review` or `Done`. An `In Review` ticket has passed automated code review and all tests — the work is finished, it's just waiting in the approval queue.
+
+---
+
 ## Step 1: Find All Ready Tickets
 
 Read TRACKER.md and scan the ticket summary table. A ticket is **ready** when:
 - Its status is `Todo`
-- ALL tickets listed in its "Depends On" column have status `Done`
+- ALL tickets listed in its "Depends On" column have status `In Review` or `Done`
 
 Collect all ready tickets into a pool. This is the work available right now.
 
 If no tickets are ready but some are still `Todo`, check why — their dependencies might be `In Progress` or blocked. Report this and stop.
 
-If all tickets are `Done`, the loop is complete. Report the summary and stop.
+If all tickets are `In Review` or `Done`, the loop is complete. Report the summary and stop.
 
 ---
 
@@ -108,7 +129,7 @@ If all tickets are `Done`, the loop is complete. Report the summary and stop.
 
 From the ready pool, spawn up to 3 agents. Each agent works on one ticket independently.
 
-There are no restrictions on which tickets can run in parallel. Two tickets in the same module can run simultaneously — merge conflicts are handled by the orchestrator's rebase strategy (see Merge and Rebase below).
+There are no restrictions on which tickets can run in parallel. Two tickets in the same module can run simultaneously — merge conflicts are handled by the orchestrator's merge strategy (see Merge and Conflict Resolution below).
 
 If only 1 or 2 tickets are ready, run what's available. Don't wait for more.
 
@@ -155,9 +176,9 @@ As each agent completes (not waiting for all agents), the orchestrator immediate
 
 ### On APPROVE:
 
-1. **Merge the branch into main.** If the branch merges cleanly, great. If there's a conflict, rebase it (see Merge and Rebase below).
-2. **Update TRACKER.md.** Mark the ticket as `Done`.
-3. **Check for newly unblocked tickets.** Read TRACKER.md — did this completion unblock any `Todo` tickets whose dependencies are now all `Done`?
+1. **Merge main into the feature branch.** Pull updated main into the agent's feature branch. If it merges cleanly and tests pass, push and create a PR to merge into main. If there's a conflict, resolve it (see Merge and Conflict Resolution below).
+2. **Update TRACKER.md.** Mark the ticket as `In Review` with a link to the PR. The ticket moves to `Done` only after the human merges the PR.
+3. **Check for newly unblocked tickets.** Tickets whose dependencies are all `In Review` or `Done` are considered ready. An `In Review` ticket has passed code review and tests — the code is complete, it's just awaiting human sign-off.
 4. **Spawn a new agent** if there's an open slot (fewer than 3 running) and a newly ready ticket. This keeps the pipeline full.
 
 ### On REQUEST CHANGES (failed twice):
@@ -181,30 +202,28 @@ As each agent completes (not waiting for all agents), the orchestrator immediate
 
 This is how the orchestrator handles the fact that multiple agents branch from the same base and may modify overlapping files.
 
-### The merge order
+### The merge workflow
 
-Agents complete at different times. The orchestrator merges branches in completion order — first agent done gets merged first.
+When an agent completes and its code review passes, the orchestrator prepares the branch for a PR:
 
-### When a branch has conflicts
+1. **Pull updated main into the feature branch.** Run `git merge main` on the feature branch. This brings in any work that was merged into main since the agent branched (e.g., PRs the human approved while this agent was working). Both sets of changes are preserved.
 
-After Agent 1's branch merges into main, Agent 2's branch (which was based on the pre-merge main) may not merge cleanly. The orchestrator handles this:
+2. **If merge succeeds cleanly:** Run the test suite on the merged branch. If tests pass, push the branch and create a PR to merge into main. If tests fail, a logical conflict exists (the two tickets interact in a way that breaks behavior) — proceed to the conflict resolution agent.
 
-1. **Attempt rebase.** Run `git rebase main` on Agent 2's branch. This replays Agent 2's changes on top of the updated main (which now includes Agent 1's work). Both sets of changes are preserved — Agent 1's work is the new base, Agent 2's commits are replayed on top.
+3. **If merge has line-level conflicts:** Don't attempt auto-resolution. Proceed to the conflict resolution agent.
 
-2. **If rebase succeeds cleanly:** Run the test suite on the rebased branch. If tests pass, merge it. If tests fail, a logical conflict exists (the two tickets interact in a way that breaks behavior) — proceed to the conflict resolution agent.
-
-3. **If rebase has line-level conflicts:** Don't attempt auto-resolution. Proceed to the conflict resolution agent.
+Note: since PRs require human approval, main only moves forward when the human merges a PR. Multiple agents may create PRs around the same time, but the human controls the merge order. When the human merges one PR, the other open PRs may need their branches updated — but that happens on the next loop iteration or when the human requests it.
 
 ### Conflict Resolution Agent
 
-When a rebase fails (line conflicts) or succeeds but tests break (logical conflict), the orchestrator spawns a dedicated **conflict resolution agent**. This agent has full context to make an informed decision about how to combine the two tickets' work.
+When a merge has line conflicts or merges cleanly but tests break (logical conflict), the orchestrator spawns a dedicated **conflict resolution agent**. This agent has full context to make an informed decision about how to combine the two tickets' work.
 
 The conflict resolution agent receives:
 - Both ticket files (the two tickets whose changes conflict)
 - The implementation spec (coding conventions and module interfaces)
 - The review reports from both tickets (what was implemented and why)
 - The conflict diff (which files and lines are in conflict)
-- The test failure output (if it's a logical conflict with a clean rebase)
+- The test failure output (if it's a logical conflict with a clean merge)
 
 The agent's job:
 
@@ -214,15 +233,11 @@ The agent's job:
 
 3. **Run tests.** After resolving, run the full test suite. Both tickets' tests must pass.
 
-4. **If resolution succeeds:** Commit the resolved version on Agent 2's branch. The orchestrator merges it into main.
+4. **If resolution succeeds:** Commit the resolved merge on the feature branch. The orchestrator pushes and creates the PR to merge into main. The human reviews and approves as usual.
 
-5. **If resolution fails:** The agent reports that it couldn't reconcile the two changes. The ticket is marked `Blocked` in TRACKER with a note: "Conflict with [other ticket] — needs human resolution." The branch is left in its pre-rebase state so a human can resolve it manually.
+5. **If resolution fails:** The agent reports that it couldn't reconcile the two changes. The ticket is marked `Blocked` in TRACKER with a note: "Conflict with [other ticket] — needs human resolution." The branch is left in its pre-merge state so the human can resolve it manually.
 
 One attempt only. If the conflict resolution agent can't fix it, a human needs to look. Don't loop on conflict resolution — it risks making things worse.
-
-### Why rebase instead of merge commits
-
-Rebase produces a clean linear history. Each ticket's changes appear as a coherent set of commits on main, not interleaved with merge commits. This makes it easier to understand what each ticket changed and to revert if needed.
 
 ---
 
@@ -230,7 +245,7 @@ Rebase produces a clean linear history. Each ticket's changes appear as a cohere
 
 The loop runs continuously as agents complete and new work becomes available. It stops when:
 
-- **All tickets are `Done`.** Success — report and finish.
+- **All tickets are `In Review` or `Done`.** All work has been implemented and PRs are ready for human approval. Report and finish.
 - **No agents are running and no tickets are ready.** Remaining tickets are all blocked by dependencies that aren't met. Report what's blocked and why.
 - **The ticket limit has been reached.** Stop even if more tickets are available.
 
@@ -248,13 +263,13 @@ After the loop ends, produce a summary:
 **Tickets remaining:** [count]
 **Concurrency:** up to 3 parallel agents
 
-## Completed Tickets
+## PRs Ready for Review
 
-| Ticket | Title | Branch | Review Verdict | Notes |
-|--------|-------|--------|----------------|-------|
-| T-004  | Auth Service | ticket/T-004-auth-service | APPROVE | Clean first pass |
-| T-015  | CI/CD Pipeline | ticket/T-015-github-actions | APPROVE | Ran parallel with T-004 |
-| T-005  | Auth Endpoints | ticket/T-005-auth-endpoints | APPROVE (2nd attempt) | Fixed missing input validation |
+| Ticket | Title | Branch | PR | Review Verdict | Notes |
+|--------|-------|--------|----|----------------|-------|
+| T-004  | Auth Service | ticket/T-004-auth-service | #12 | APPROVE | Clean first pass |
+| T-015  | CI/CD Pipeline | ticket/T-015-github-actions | #13 | APPROVE | Ran parallel with T-004 |
+| T-005  | Auth Endpoints | ticket/T-005-auth-endpoints | #14 | APPROVE (2nd attempt) | Fixed missing input validation |
 
 ## Failed Tickets
 
@@ -266,7 +281,7 @@ After the loop ends, produce a summary:
 
 | Ticket | Conflicted With | Resolution |
 |--------|----------------|------------|
-| T-007  | T-006 | Auto-rebased, tests passed |
+| T-007  | T-006 | Auto-merged main, tests passed |
 | T-008  | T-007 | Manual resolution needed |
 
 ## Remaining Tickets
@@ -337,6 +352,6 @@ If the loop is interrupted mid-run, the state is recoverable:
 - TRACKER.md is the source of truth — if it still shows `Todo`, the ticket hasn't been delivered
 - Re-running the loop will pick up where it left off based on TRACKER state
 
-### When a rebase changes behavior without conflict
+### When a merge succeeds but changes behavior
 
-A rebase can succeed (no git conflicts) but still break things if Agent 1's changes affect Agent 2's logic. This is why the orchestrator runs tests after every rebase. If tests fail after a clean rebase, the conflict resolution agent is spawned — it has both tickets' context and can understand the interaction between the two changes to fix the logical conflict.
+A merge can succeed (no git conflicts) but still break things if Agent 1's changes affect Agent 2's logic. This is why the orchestrator runs tests after every merge. If tests fail after a clean merge of main into the feature branch, the conflict resolution agent is spawned — it has both tickets' context and can understand the interaction between the two changes to fix the logical conflict.

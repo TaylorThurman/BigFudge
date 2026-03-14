@@ -74,7 +74,7 @@ This prevents duplicate code, inconsistent patterns, and broken integrations.
 
 ### 2.1 Check Dependency Status
 
-Read `TRACKER.md` and verify that every ticket listed as a dependency for this ticket is marked `Done`. If any dependency is not `Done`, stop and report the blocker. Do not proceed — implementing out of order creates integration problems that are harder to fix than waiting.
+Read `TRACKER.md` and verify that every ticket listed as a dependency for this ticket is marked `Done` or `In Review`. Both statuses mean the dependency's code is complete — `In Review` means the PR is awaiting human approval, `Done` means it's been merged. If any dependency is in another status (`Todo`, `In Progress`, `Blocked`), stop and report the blocker. Do not proceed — implementing out of order creates integration problems that are harder to fix than waiting.
 
 Format the blocker report clearly:
 
@@ -191,7 +191,7 @@ Fix any issues. Don't submit code with lint warnings.
 
 ### 5.1 Update TRACKER.md
 
-Change the ticket's status from `Todo` (or `In Progress`) to `Done` in TRACKER.md. Use the exact status values the tracker defines (check the tracker's own conventions — some use `Done`, others `Complete`, others checkmarks).
+Change the ticket's status from `Todo` (or `In Progress`) to `In Review` in TRACKER.md. The ticket moves to `Done` only after the project owner approves and merges the PR. If the tracker uses different conventions, match its terminology — but the intent is the same: the code is complete and awaiting human approval.
 
 ### 5.2 Create a Feature Branch and Commit
 

@@ -1,6 +1,6 @@
 ---
 name: ticket-implementer
-description: "Implements a single development ticket from the SDLC skill chain. Reads the ticket, loads project context (implementation spec, CLAUDE.md, architecture), writes the code and tests, verifies tests pass, updates TRACKER.md, and creates a PR. Triggers: 'implement this ticket', 'pick up T-001', 'work on this story', 'start coding', 'implement the next ticket', 'build this feature', 'pick up the next task'. Use this skill whenever a developer or agent needs to take a ticket from the backlog and turn it into working, tested code with a pull request."
+description: "Implements a single development ticket from the SDLC skill chain. Reads the ticket, loads project context (implementation spec, CLAUDE.md, architecture), writes the code and tests, verifies tests pass, and creates a feature branch with PR. Triggers: 'implement this ticket', 'pick up T-001', 'work on this story', 'implement the next ticket', 'pick up the next task'. This skill implements ONE ticket at a time. If the user wants to implement ALL tickets automatically, use the implementation-loop skill instead. If the user has requirements but no tickets yet, use the sdlc-router skill instead."
 ---
 
 # Ticket Implementer

@@ -1,6 +1,6 @@
 ---
 name: implementation-loop
-description: "Autonomous implementation loop that picks up tickets from TRACKER.md and builds them in dependency order. For each ticket: runs the ticket-implementer, then the code-reviewer, and if approved, moves to the next ticket. Stops when no tickets are available, a review requests changes twice, or a blocker is hit. Triggers: 'start building', 'implement the tickets', 'build the backlog', 'start the implementation loop', 'pick up available tickets', 'build what's ready', 'run the implementation loop', 'start coding the tickets'. Use after the SDLC planning chain has produced tickets."
+description: "Autonomous implementation loop that picks up tickets from TRACKER.md and builds them in dependency order. For each ticket: runs the ticket-implementer, then the code-reviewer, and if approved, moves to the next ticket. Stops when no tickets are available, a review requests changes twice, or a blocker is hit. Triggers: 'start the implementation loop', 'run the implementation loop', 'implement the tickets', 'build the backlog', 'pick up available tickets', 'start the build loop'. This skill turns existing tickets into code — it does NOT create tickets or run planning. Use after the SDLC planning chain has already produced tickets in TRACKER.md. If the user has requirements but no tickets yet, use the sdlc-router skill instead."
 ---
 
 # Implementation Loop

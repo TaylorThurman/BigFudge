@@ -1,6 +1,6 @@
 ---
 name: sdlc-router
-description: "Orchestrator for the SDLC skill chain. Receives new requirements or change requests, assesses the current project state by reading existing documents, determines which SDLC phases need to run, executes them in order with validation between each, and escalates to the user only when genuinely ambiguous. Triggers: 'build this', 'new feature', 'add a strategy', 'update the project', 'here are new requirements', 'start the SDLC', 'run the chain', 'implement this'. Use this skill whenever someone provides requirements or changes that should flow through the SDLC pipeline, especially when input comes from an upstream research or approval chain."
+description: "Orchestrator for the SDLC planning chain. Receives new requirements or change requests, assesses the current project state by reading existing documents, determines which planning phases need to run, executes them in order with validation between each, and escalates to the user only when genuinely ambiguous. Triggers: 'plan this project', 'new requirements', 'new feature request', 'add a strategy', 'update the requirements', 'start the SDLC', 'run the planning chain', 'here are new requirements', 'define the project'. This skill handles PLANNING only — it produces specs and tickets. It does NOT build code or run the implementation loop. If the user wants to start building from existing tickets, use the implementation-loop skill instead."
 ---
 
 # SDLC Router

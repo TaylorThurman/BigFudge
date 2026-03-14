@@ -22,7 +22,7 @@ sdlc-router
     └── test-plan             How do we validate it?
 ```
 
-**Start here:** Give the `sdlc-router` your requirements — "build an expense tracker" or "add a new trading strategy." It figures out which planning steps are needed (not every change needs all five) and runs them in order. The output is a set of tickets in TRACKER.md, ready to build.
+**Start here:** Say "Plan this project — [your requirements]" for a new project, or "New requirements — [what changed]" to update an existing one. The router reads whatever docs already exist, figures out which planning steps are needed (not every change needs all five), and runs them in order. The output is a set of tickets in TRACKER.md, ready to build.
 
 **Skills:**
 
@@ -48,7 +48,7 @@ implementation-loop
     └── code-reviewer         Review before merge
 ```
 
-**Start here:** Run the `implementation-loop` after planning is done. It reads TRACKER.md, finds all tickets whose dependencies are complete (`In Review` or `Done`), and spawns up to 3 agents working in parallel. As each agent finishes, main is merged into the feature branch, tests run, and a PR is created — but never auto-merged. The project owner reviews and approves every PR before code enters main. When a PR is created the ticket moves to `In Review`, which unblocks dependent tickets so agents keep working without waiting for human approval. If two branches conflict during the merge, a conflict resolution agent reads both tickets' context and resolves it intelligently. The loop keeps going until all tickets have PRs up or it hits a blocker.
+**Start here:** Say "Start the implementation loop" after planning is done. It reads TRACKER.md, finds all tickets whose dependencies are complete (`In Review` or `Done`), and spawns up to 3 agents working in parallel. As each agent finishes, main is merged into the feature branch, tests run, and a PR is created — but never auto-merged. The project owner reviews and approves every PR before code enters main. When a PR is created the ticket moves to `In Review`, which unblocks dependent tickets so agents keep working without waiting for human approval. If two branches conflict during the merge, a conflict resolution agent reads both tickets' context and resolves it intelligently. The loop keeps going until all tickets have PRs up or it hits a blocker.
 
 **Skills:**
 
@@ -75,7 +75,7 @@ issue-triage
     └── Config issue ──► direct fix
 ```
 
-**Start here:** Tell `issue-triage` what's wrong — "the bot isn't closing positions when RSI drops below 30." It investigates the code, specs, and architecture to figure out which layer the problem is at, then routes it to the right fix path. Bugs go straight to the implementer. Missing requirements or design gaps go back through the planning chain.
+**Start here:** Say "Something is broken — [describe the issue]", for example "Something is broken — the bot isn't closing positions when RSI drops below 30." It investigates the code, specs, and architecture to figure out which layer the problem is at, then routes it to the right fix path. Bugs go straight to the implementer. Missing requirements or design gaps go back through the planning chain.
 
 **Skills:**
 

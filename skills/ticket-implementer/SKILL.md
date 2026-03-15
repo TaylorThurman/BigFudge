@@ -197,6 +197,16 @@ Fix any issues. Don't submit code with lint warnings.
 
 ### 5.2 Create a Feature Branch and Commit
 
+**Always branch from main.** Before creating the feature branch, checkout main and pull the latest:
+
+```bash
+git checkout main
+git pull origin main
+git checkout -b feature/T-[XXX]-[brief-description]
+```
+
+This is critical — every ticket gets its own branch created from the current state of main. Never commit to another ticket's branch. Never branch from a feature branch.
+
 Branch naming convention: `feature/T-[XXX]-[brief-description]`
 
 Examples:

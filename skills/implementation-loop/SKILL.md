@@ -135,7 +135,18 @@ If only 1 or 2 tickets are ready, run what's available. Don't wait for more.
 
 ### Each agent does:
 
-**2a. Implement the ticket**
+**2a. Start from a clean main**
+
+Before invoking the implementer, the orchestrator ensures the agent starts from the latest main:
+
+```bash
+git checkout main
+git pull origin main
+```
+
+This is critical. Without this step, an agent that just finished one ticket will still be on that ticket's feature branch — and the next ticket's work will be committed to the wrong branch.
+
+**2b. Implement the ticket**
 
 Invoke the ticket-implementer workflow. Pass it:
 - The ticket file path
@@ -147,7 +158,7 @@ The implementer will:
 2. Verify prerequisites (dependency check — should pass since the orchestrator pre-checked)
 3. Write the code and tests
 4. Run tests
-5. Create a feature branch and commit
+5. Checkout main, then create a new feature branch (`feature/T-XXX-description`) from main and commit
 6. Write a PR description
 
 **Important:** The implementer does NOT update TRACKER.md or merge into main. It creates a feature branch and reports back.

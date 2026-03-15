@@ -36,7 +36,7 @@ Find and read the ticket file that this PR implements. The ticket contains:
 - Dependencies (which tickets this one builds on)
 - Implementation notes (constraints and interfaces the code must satisfy)
 
-If the PR description references a ticket ID (e.g., `[T-006]`), find the ticket file in the project's ticket directory.
+If the PR description references a ticket ID (e.g., `T-006:`), find the ticket file in the project's ticket directory.
 
 ### 1.2 Read the PR Description
 
@@ -339,13 +339,13 @@ If the PR exists on GitHub and `gh` CLI is available:
 
 If `gh` is not available or the PR doesn't exist on GitHub, skip this step. The review report file is the primary output.
 
-### 5.3 Save the Review Report
+### 5.3 Commit the Review Report
 
 **When running standalone** (not inside the implementation-loop): commit the review report to the feature branch so it's part of the PR history:
 
 ```bash
 git add reviews/
-git commit -m "[T-XXX] Add code review report
+git commit -m "T-XXX: Add code review report
 
 Verdict: [APPROVE/REQUEST CHANGES/BLOCKED]
 Findings: [count] must-fix, [count] should-fix, [count] nits"

@@ -134,7 +134,7 @@ issue-triage
 
 ## Ticket Principles
 
-Every ticket is **one focused concern** — a single logical task that can be described in one sentence without joining unrelated concerns with "and." Tickets are sized Small (1-2 files) or Medium (multiple files, one concern). There is no Large tier — if it feels large, split it.
+Every ticket has **one reason to change.** If two parts of a ticket can break independently, be tested independently, or be modified without affecting each other — they belong in separate tickets. A page is not one ticket (each component has its own reason to change). A service class with methods serving different consumers is not one ticket. Cross-cutting configuration belongs with the component it serves, not in a separate pass. Tickets are sized Small or Medium — there is no Large tier.
 
 **Prioritization:** Tickets are ordered by impact within each vertical slice. The TRACKER's ticket order IS the priority order. High-impact, foundational work comes first.
 

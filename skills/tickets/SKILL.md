@@ -44,7 +44,16 @@ The ticket skill consumes the architecture blueprint (for what to build) and the
 
 ## Core Principles
 
-**One ticket, one focused concern.** Each ticket does exactly one logical thing — add a data model, wire up an endpoint, implement a validation rule. A ticket can touch multiple files if they all serve the same concern, but it should never combine unrelated concerns (e.g., "set up the database AND add the API routes AND write the dashboard component"). If a coding agent reading a ticket thinks "this is actually two or three tasks," split it. Smaller tickets are easier to implement correctly, easier to review, and easier to debug when something breaks.
+**One ticket, one focused concern.** Each ticket does exactly one logical thing — add a data model, wire up an endpoint, implement one UI component. A ticket can touch multiple files if they all serve the same concern, but it should never combine unrelated concerns. If a coding agent reading a ticket thinks "this is actually two or three tasks," split it. Smaller tickets are easier to implement correctly, easier to review, and easier to debug when something breaks.
+
+Apply these decomposition rules to identify when a ticket is too big:
+
+- **UI pages/screens:** A page is NOT one ticket. Each distinct section, component, or widget on the page is its own ticket. A dashboard with a status indicator, strategy cards, progress bars, and a P&L summary is at minimum 4 tickets (one per component) plus a layout/shell ticket that wires them together. Count the number of visually distinct sections — that's your minimum ticket count.
+- **API endpoints:** An endpoint with complex business logic splits into: (1) the data/model layer, (2) the business logic/service layer, (3) the route/controller that ties them together. Simple CRUD endpoints can stay as one ticket.
+- **Multi-step workflows:** Each step is its own ticket. A workflow that validates input, processes data, sends notifications, and updates state is 4 tickets, not 1.
+- **Acceptance criteria count:** If a ticket has more than 3-4 acceptance criteria, it's almost certainly doing too much. Each acceptance criterion should map to one clearly testable behavior. If you're listing 7+ criteria, you're describing multiple tickets.
+
+**The counting test:** Count the distinct nouns in the ticket description. "Bot status indicator, strategy cards, shadow evaluation progress bars, portfolio P&L, pipeline summaries, and approval badges" is 6 nouns = at minimum 6 tickets. One ticket = one noun.
 
 **Self-contained context.** Each ticket must include everything a coding agent needs to complete the work without reading the full architecture blueprint or implementation spec. Pull in the specific interfaces, data structures, and conventions that are relevant — don't just reference them.
 
@@ -152,19 +161,40 @@ Example for a smart home system:
 - **Slice 3:** Preference learning (data collection → model → suggestion API)
 - **Slice 4:** Energy tracking (meter reading → aggregation → weekly report generation)
 - **Slice 5:** Alerting (event detection → Telegram notification → alert history)
-- **Slice 6:** Dashboard (web UI consuming all existing API endpoints)
+- **Slice 6:** Dashboard (web UI — page shell, sensor status widget, automation controls widget, energy chart widget, alert feed widget, each as separate tickets)
 
 ### Step 3: Decompose Each Slice into Tickets
 
-Within each slice, break the work into tickets that are each completable in a single focused session. A vertical slice typically produces 2-5 tickets.
+Within each slice, break the work into tickets that are each completable in a single focused session. There is no target range for tickets per slice — a simple slice might produce 3 tickets, a complex dashboard slice might produce 10+. The right number of tickets is however many it takes to ensure each ticket is one focused concern.
 
 Guidelines for scoping — every ticket is **one focused concern**:
 - **Small ticket** (~300-500 tokens): Single file or class, one concern. Example: "SensorReading data model and database schema."
 - **Medium ticket** (~500-800 tokens): Multiple files serving one concern. Example: "ZigbeeReader that polls sensors and persists readings."
 
-There is no "large" tier. If a ticket feels large, it's multiple concerns — split it. For example, "Telegram alerter with event detection, message formatting, and send queue" is three tickets: (1) event detection rules, (2) message formatter, (3) send queue with Telegram integration.
+There is no "large" tier. If a ticket feels large, it's multiple concerns — split it.
 
 **The split test:** Can you describe the ticket in one sentence without using "and" to join unrelated concerns? If not, split it.
+
+**The acceptance criteria test:** If a ticket has more than 3-4 acceptance criteria, split it. Each criterion maps to one testable behavior — more criteria means more concerns.
+
+**The counting test:** Count the distinct components or nouns in the description. Each one is likely its own ticket.
+
+**Example — wrong way (one bloated ticket):**
+> "Home status page: bot status indicator, per-strategy cards, shadow evaluation progress bars, combined P&L, pipeline summaries, approval badges, HTMX partial refresh, mobile responsive layout"
+
+This is 8 concerns crammed into 1 ticket. It will have gaps, be hard to review, and hard to debug.
+
+**Example — right way (decomposed):**
+1. "Dashboard page shell and layout grid" — the empty page structure with navigation, responsive grid, and HTMX setup
+2. "Bot status indicator component" — running/stopped/error badge with visual distinction
+3. "Strategy overview cards" — per-strategy card showing name, mode, positions, today's P&L
+4. "Shadow evaluation progress bars" — progress display with days elapsed / total for active evaluations
+5. "Portfolio P&L summary component" — combined P&L display across all strategies
+6. "Pipeline and research run summaries" — last-run timestamps and counts
+7. "Approval quick-link badges" — pending proposal counts per gate with navigation links
+8. "Dashboard HTMX partial refresh wiring" — connect live data endpoints to each component for auto-refresh
+
+Each ticket is independently buildable, testable, and reviewable. The first ticket (shell) is a dependency for the rest. The component tickets can run in parallel.
 
 Within a slice, tickets should still follow a logical order — data model before business logic before interface layer. But across slices, the key is that each slice is independently completable and produces a working feature.
 

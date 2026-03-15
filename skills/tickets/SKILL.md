@@ -44,16 +44,23 @@ The ticket skill consumes the architecture blueprint (for what to build) and the
 
 ## Core Principles
 
-**One ticket, one focused concern.** Each ticket does exactly one logical thing — add a data model, wire up an endpoint, implement one UI component. A ticket can touch multiple files if they all serve the same concern, but it should never combine unrelated concerns. If a coding agent reading a ticket thinks "this is actually two or three tasks," split it. Smaller tickets are easier to implement correctly, easier to review, and easier to debug when something breaks.
+**One ticket, one reason to change.** A ticket should have exactly one reason to change in the future. If two parts of a ticket can break independently, be tested independently, or be modified without affecting each other — they belong in separate tickets. This is the fundamental rule that all other decomposition guidance flows from.
 
-Apply these decomposition rules to identify when a ticket is too big:
+The test: ask "if I need to change or fix part of this ticket later, would I also need to touch the other parts?" If no, they're separate tickets. A bot status indicator and a P&L summary can break independently, be tested independently, and be modified independently — so they're separate tickets, even if they live on the same page.
 
-- **UI pages/screens:** A page is NOT one ticket. Each distinct section, component, or widget on the page is its own ticket. A dashboard with a status indicator, strategy cards, progress bars, and a P&L summary is at minimum 4 tickets (one per component) plus a layout/shell ticket that wires them together. Count the number of visually distinct sections — that's your minimum ticket count.
-- **API endpoints:** An endpoint with complex business logic splits into: (1) the data/model layer, (2) the business logic/service layer, (3) the route/controller that ties them together. Simple CRUD endpoints can stay as one ticket.
-- **Multi-step workflows:** Each step is its own ticket. A workflow that validates input, processes data, sends notifications, and updates state is 4 tickets, not 1.
-- **Acceptance criteria count:** If a ticket has more than 3-4 acceptance criteria, it's almost certainly doing too much. Each acceptance criterion should map to one clearly testable behavior. If you're listing 7+ criteria, you're describing multiple tickets.
+**How to apply this to common patterns:**
 
-**The counting test:** Count the distinct nouns in the ticket description. "Bot status indicator, strategy cards, shadow evaluation progress bars, portfolio P&L, pipeline summaries, and approval badges" is 6 nouns = at minimum 6 tickets. One ticket = one noun.
+- **UI pages/screens:** A page is NOT one ticket. Each distinct component or widget is its own ticket — it has its own reason to change (different data source, different layout, different update frequency). A dashboard with a status indicator, strategy cards, and progress bars is at minimum 3 component tickets plus a layout/shell ticket. The shell ticket's reason to change is the page structure; each component's reason to change is its specific data and presentation.
+
+- **Service classes with multiple methods:** A service class where each method serves a different consumer (different endpoint, different component, different feature) is NOT one ticket. Each method that serves an independent consumer is its own ticket, because that method changes when its consumer's needs change — not when unrelated methods change. A `DashboardService` with `get_bot_status()`, `get_portfolio_pnl()`, and `get_pending_approvals()` is at least 3 tickets — each method is independently testable and changes for independent reasons.
+
+- **Cross-cutting configuration:** Configuring the same thing (polling intervals, permissions, validation rules) across multiple independent components is NOT one ticket. Each component's configuration changes independently — the bot status polling interval has nothing to do with the approval badges polling interval. Group configuration tickets by the component they serve, not by the type of configuration.
+
+- **API endpoints:** An endpoint with complex business logic splits along consumer boundaries. If one route serves one consumer with one data transformation, it's one ticket. If a route aggregates data for multiple independent purposes, split by purpose.
+
+- **Multi-step workflows:** Each step that can fail independently or be modified independently is its own ticket. A workflow that validates input, processes data, and sends notifications is 3 tickets — input validation rules change for different reasons than notification formatting.
+
+**Simple CRUD is the exception.** A straightforward create/read/update/delete for a single resource (one model, one set of routes, one set of tests) can stay as one ticket — all the operations exist for the same reason (managing that resource) and change together.
 
 **Self-contained context.** Each ticket must include everything a coding agent needs to complete the work without reading the full architecture blueprint or implementation spec. Pull in the specific interfaces, data structures, and conventions that are relevant — don't just reference them.
 
@@ -173,28 +180,28 @@ Guidelines for scoping — every ticket is **one focused concern**:
 
 There is no "large" tier. If a ticket feels large, it's multiple concerns — split it.
 
-**The split test:** Can you describe the ticket in one sentence without using "and" to join unrelated concerns? If not, split it.
+**The independence test:** For each piece of work in the ticket, ask: "Can this break without the other pieces breaking? Can this be tested without testing the other pieces? Can this be modified without touching the other pieces?" If the answer to any of these is yes, split them into separate tickets.
 
-**The acceptance criteria test:** If a ticket has more than 3-4 acceptance criteria, split it. Each criterion maps to one testable behavior — more criteria means more concerns.
-
-**The counting test:** Count the distinct components or nouns in the description. Each one is likely its own ticket.
-
-**Example — wrong way (one bloated ticket):**
+**Example — wrong way (multiple reasons to change in one ticket):**
 > "Home status page: bot status indicator, per-strategy cards, shadow evaluation progress bars, combined P&L, pipeline summaries, approval badges, HTMX partial refresh, mobile responsive layout"
 
-This is 8 concerns crammed into 1 ticket. It will have gaps, be hard to review, and hard to debug.
+Each of these has its own data source, its own presentation logic, and its own reason to change. Fixing the P&L calculation doesn't require touching the approval badges. Changing the strategy card layout doesn't affect the pipeline summary. Yet they're all in one ticket — which means the implementer has to hold all of them in context, the reviewer has to verify all of them, and a bug in any one of them blocks the entire ticket.
 
-**Example — right way (decomposed):**
-1. "Dashboard page shell and layout grid" — the empty page structure with navigation, responsive grid, and HTMX setup
-2. "Bot status indicator component" — running/stopped/error badge with visual distinction
-3. "Strategy overview cards" — per-strategy card showing name, mode, positions, today's P&L
-4. "Shadow evaluation progress bars" — progress display with days elapsed / total for active evaluations
-5. "Portfolio P&L summary component" — combined P&L display across all strategies
-6. "Pipeline and research run summaries" — last-run timestamps and counts
-7. "Approval quick-link badges" — pending proposal counts per gate with navigation links
-8. "Dashboard HTMX partial refresh wiring" — connect live data endpoints to each component for auto-refresh
+**Example — right way (one reason to change per ticket):**
 
-Each ticket is independently buildable, testable, and reviewable. The first ticket (shell) is a dependency for the rest. The component tickets can run in parallel.
+| Ticket | Reason to change | Independent of |
+|--------|-----------------|----------------|
+| Dashboard page shell and layout grid | Page structure changes | All component content |
+| Bot status indicator component | Bot status logic or display changes | Every other component |
+| Strategy overview cards | Strategy data or card layout changes | Every other component |
+| Shadow evaluation progress bars | Evaluation tracking changes | Every other component |
+| Portfolio P&L summary | P&L calculation or display changes | Every other component |
+| Pipeline and research run summaries | Pipeline/research data changes | Every other component |
+| Approval quick-link badges | Approval queue logic changes | Every other component |
+| Bot status + portfolio P&L service methods | Status and P&L data aggregation changes | Approval and pipeline service methods |
+| Pipeline + approval service methods | Pipeline and approval data queries change | Status and P&L service methods |
+
+Each ticket is independently buildable, testable, and reviewable. A bug in one doesn't block the others. A change request for one doesn't create noise in the others' PRs.
 
 Within a slice, tickets should still follow a logical order — data model before business logic before interface layer. But across slices, the key is that each slice is independently completable and produces a working feature.
 

@@ -31,7 +31,7 @@ sdlc-router
 | `sdlc-router` | Execution plan + orchestration | Always — it decides what else runs |
 | `product-spec` | PRODUCT.md, FEATURES.md, features/*.md | New project or new feature |
 | `architecture-blueprint` | Components, data flow, infrastructure design | New system design or design changes |
-| `implementation-spec` | Code conventions, module interfaces, CLAUDE.md | New codebase patterns or interface changes |
+| `implementation-spec` | Code conventions, module interfaces, CLAUDE.md, project README | New codebase patterns or interface changes |
 | `tickets` | TRACKER.md + individual ticket files per slice | Almost always — work needs to be tracked |
 | `test-plan` | Test layers, tooling, coverage targets | New test patterns or tooling changes |
 
@@ -129,6 +129,24 @@ issue-triage
 | **Total** | **10** | |
 
 **TRACKER Status Lifecycle:** `Todo → In Progress → In Review → Done` (and `Blocked`). Tickets move to `In Review` when code is complete and a PR is created. They move to `Done` only after the project owner approves and merges the PR. Dependencies are considered met at `In Review` — agents don't wait for human approval to start dependent work.
+
+---
+
+## Ticket Principles
+
+Every ticket is **one focused concern** — a single logical task that can be described in one sentence without joining unrelated concerns with "and." Tickets are sized Small (1-2 files) or Medium (multiple files, one concern). There is no Large tier — if it feels large, split it.
+
+**Prioritization:** Tickets are ordered by impact within each vertical slice. The TRACKER's ticket order IS the priority order. High-impact, foundational work comes first.
+
+**Traceability:** Every ticket (except Slice 0 foundation) links to a specific requirement via its `Requirements` field (e.g., `FR-003 from features/risk-alerts.md`). This creates a direct chain: business requirement → ticket → branch → PR → merged code.
+
+**Naming conventions** flow from ticket to branch to commit to PR:
+
+| Artifact | Format | Example |
+|----------|--------|---------|
+| Branch | `feature/T-XXX-short-desc` | `feature/T-003-zigbee-reader` |
+| Commit | `T-XXX: Description` | `T-003: Add Zigbee sensor reader with persistence` |
+| PR title | `T-XXX: Description` | `T-003: Add Zigbee sensor reader with persistence` |
 
 ---
 

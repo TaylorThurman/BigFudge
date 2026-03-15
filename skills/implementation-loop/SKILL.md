@@ -267,9 +267,9 @@ After the loop ends, produce a summary:
 
 | Ticket | Title | Branch | PR | Review Verdict | Notes |
 |--------|-------|--------|----|----------------|-------|
-| T-004  | Auth Service | ticket/T-004-auth-service | #12 | APPROVE | Clean first pass |
-| T-015  | CI/CD Pipeline | ticket/T-015-github-actions | #13 | APPROVE | Ran parallel with T-004 |
-| T-005  | Auth Endpoints | ticket/T-005-auth-endpoints | #14 | APPROVE (2nd attempt) | Fixed missing input validation |
+| T-004  | Auth Service | feature/T-004-auth-service | #12 | APPROVE | Clean first pass |
+| T-015  | CI/CD Pipeline | feature/T-015-github-actions | #13 | APPROVE | Ran parallel with T-004 |
+| T-005  | Auth Endpoints | feature/T-005-auth-endpoints | #14 | APPROVE (2nd attempt) | Fixed missing input validation |
 
 ## Failed Tickets
 

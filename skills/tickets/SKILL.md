@@ -44,15 +44,25 @@ The ticket skill consumes the architecture blueprint (for what to build) and the
 
 ## Core Principles
 
-**One ticket, one focus.** Each ticket should do one thing well. A coding agent reading a ticket should never think "this is actually three tasks." If it feels too big, split it.
+**One ticket, one focused concern.** Each ticket does exactly one logical thing — add a data model, wire up an endpoint, implement a validation rule. A ticket can touch multiple files if they all serve the same concern, but it should never combine unrelated concerns (e.g., "set up the database AND add the API routes AND write the dashboard component"). If a coding agent reading a ticket thinks "this is actually two or three tasks," split it. Smaller tickets are easier to implement correctly, easier to review, and easier to debug when something breaks.
 
 **Self-contained context.** Each ticket must include everything a coding agent needs to complete the work without reading the full architecture blueprint or implementation spec. Pull in the specific interfaces, data structures, and conventions that are relevant — don't just reference them.
 
-**Token-efficient.** Each ticket should target 500–1,500 tokens. That's enough for a clear description, acceptance criteria, relevant interfaces, and dependency notes — without bloating the agent's context window. The implementation spec (3K–5K tokens) plus a single ticket (500–1,500 tokens) should be the complete input a coding agent needs.
+**Token-efficient.** Each ticket should target 300–800 tokens. That's enough for a clear description, acceptance criteria, relevant interfaces, and dependency notes — without bloating the agent's context window. The implementation spec (3K–5K tokens) plus a single ticket (300–800 tokens) should be the complete input a coding agent needs. If a ticket is approaching 1,000+ tokens, it's doing too much — split it.
+
+**Prioritized within slices.** Within each vertical slice, tickets are ordered by impact: the most critical functionality first, nice-to-haves last. Across slices, order by dependency and business value — the slice that delivers the most value or unblocks the most other work comes first. The TRACKER's ticket order IS the priority order — the first ticket listed is the highest priority.
 
 **Vertical slices over horizontal layers.** Organize tickets so each slice delivers a working, interactable feature end-to-end — data model through backend logic through any user-facing surface. After completing a slice, the user should be able to run the system and see that feature working. The only exception is a thin foundation slice (Slice 0) for shared infrastructure that every feature depends on. Never organize tickets by technical layer (all database, then all backend, then all frontend) — that delays feedback and hides design problems.
 
+**Traceable to requirements.** Every ticket (except Slice 0 foundation) traces to a specific requirement in a feature doc via its `Requirements` field. This creates a direct link: business requirement → ticket → code change → PR. If you can't point to the requirement a ticket delivers, the ticket either shouldn't exist or the requirement is missing from the product docs.
+
 **Testable outcomes.** Every ticket has acceptance criteria that can be verified — either by running a command, checking a behavior, or inspecting an output. "It works" is not acceptance criteria. "Running `python -m pytest tests/test_parser.py` passes with all 4 test cases" is.
+
+**Standardized naming.** Ticket IDs propagate through the entire delivery chain:
+- Branch: `feature/T-XXX-short-description` (e.g., `feature/T-003-zigbee-reader`)
+- Commits: `T-XXX: Description` (e.g., `T-003: Add Zigbee sensor reader with persistence`)
+- PR title: `T-XXX: Description`
+This makes every code change traceable back to its ticket, requirement, and feature.
 
 ---
 
@@ -79,7 +89,7 @@ Every ticket follows this format:
 **Slice:** [Which vertical slice this belongs to — e.g., "Slice 0: Foundation" or "Slice 3: Preference Learning"]
 **Depends On:** [T-XXX, T-YYY, or "None — can start immediately"]
 **Requirements:** [FR-XXX from features/feature-name.md — the specific requirements this ticket delivers, or "Foundation — no direct feature requirement"]
-**Estimated Scope:** [Small | Medium | Large — relative to a single coding session]
+**Estimated Scope:** [Small | Medium — one focused concern per ticket]
 
 ### Description
 [1-3 paragraphs explaining what this ticket accomplishes. Be specific about what gets built, what it connects to, and why it exists in this order. A coding agent reading only this description should understand the task completely.]
@@ -148,12 +158,13 @@ Example for a smart home system:
 
 Within each slice, break the work into tickets that are each completable in a single focused session. A vertical slice typically produces 2-5 tickets.
 
-Guidelines for scoping:
-- **Small ticket** (~500 tokens, 1-2 hours): Single file or class. Example: "SensorReading data model and database schema."
-- **Medium ticket** (~1,000 tokens, 2-4 hours): A module with 2-3 files. Example: "ZigbeeReader that polls sensors and persists readings."
-- **Large ticket** (~1,500 tokens, 4-8 hours): A feature slice that's simple enough to not need splitting. Example: "Telegram alerter with event detection, message formatting, and send queue."
+Guidelines for scoping — every ticket is **one focused concern**:
+- **Small ticket** (~300-500 tokens): Single file or class, one concern. Example: "SensorReading data model and database schema."
+- **Medium ticket** (~500-800 tokens): Multiple files serving one concern. Example: "ZigbeeReader that polls sensors and persists readings."
 
-Prefer small and medium tickets. Large tickets should be rare — if you're writing one, consider whether it can be split.
+There is no "large" tier. If a ticket feels large, it's multiple concerns — split it. For example, "Telegram alerter with event detection, message formatting, and send queue" is three tickets: (1) event detection rules, (2) message formatter, (3) send queue with Telegram integration.
+
+**The split test:** Can you describe the ticket in one sentence without using "and" to join unrelated concerns? If not, split it.
 
 Within a slice, tickets should still follow a logical order — data model before business logic before interface layer. But across slices, the key is that each slice is independently completable and produces a working feature.
 

@@ -184,13 +184,15 @@ This section should be self-contained — a developer reading only this section 
 
 ### 7. Git Workflow
 
-How code moves from development to production:
-- Branch naming conventions
-- Commit message format
-- PR/review process
-- What goes on main vs. feature branches
+How code moves from development to production. The following conventions are mandatory and must be included in every implementation spec:
 
-Keep this brief — a few bullet points per item.
+- **Branch naming**: `feature/T-XXX-short-description` (e.g., `feature/T-003-zigbee-reader`). Every branch is tied to a ticket.
+- **Commit messages**: `T-XXX: Description` (e.g., `T-003: Add Zigbee sensor reader with persistence`). Ticket ID prefix is mandatory.
+- **PR titles**: `T-XXX: Description` — matches the commit message format.
+- **PR/review process**: All PRs require human approval before merging to main. No auto-merge.
+- **Main branch**: Always deployable. No direct commits — all changes go through feature branches and PRs.
+
+Add any project-specific conventions beyond these defaults (e.g., squash vs. merge commits, required reviewers).
 
 ### 8. Open Questions
 
@@ -225,10 +227,26 @@ For subsequent versions, use the standard Added / Changed / Removed / Clarified 
 
 ## Output
 
-Produce the implementation spec as a single Markdown file. The filename should follow the pattern:
-`[project-name]-implementation-spec-v[N].md`
+Produce two files:
 
-Save the file and present it to the user.
+### 1. Implementation Spec
+The implementation spec as a single Markdown file. Filename: `[project-name]-implementation-spec-v[N].md`
+
+### 2. Project README
+A populated top-level `README.md` for the project repository. This is the human-facing entry point — it should give someone unfamiliar with the project everything they need to understand what it is and how to work with it.
+
+The README must include:
+- **Project name and description** — What does this project do? (1-2 paragraphs)
+- **Tech stack** — Languages, frameworks, databases, key libraries
+- **Getting started** — How to install dependencies, set up the environment, and run the project locally
+- **Project structure** — A brief directory overview (the implementation spec has the full annotated tree, but the README needs a readable summary)
+- **Running tests** — The commands to run the test suite
+- **Configuration** — What environment variables or config files are needed, with example values (no real secrets)
+- **Contributing** — Brief guidance pointing to CLAUDE.md and the implementation spec for conventions
+
+The README is written once during the initial implementation spec phase and updated when the implementation spec is updated. It is a living document — not a placeholder to fill in later.
+
+Save both files and present them to the user.
 
 ---
 

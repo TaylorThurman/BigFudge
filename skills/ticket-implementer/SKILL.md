@@ -197,16 +197,16 @@ Fix any issues. Don't submit code with lint warnings.
 
 ### 5.2 Create a Feature Branch and Commit
 
-Branch naming convention: `ticket/[ticket-id]-[brief-description]`
+Branch naming convention: `feature/T-[XXX]-[brief-description]`
 
 Examples:
-- `ticket/T-006-expense-service`
-- `ticket/T-012-frontend-auth-ui`
+- `feature/T-006-expense-service`
+- `feature/T-012-frontend-auth-ui`
 
-Commit with a clear message that references the ticket:
+Commit with a clear message that references the ticket ID:
 
 ```
-[T-006] Implement expense service layer
+T-006: Implement expense service layer
 
 - Add ExpenseService with create, list, get, update, delete
 - Add input validation for amount (positive, two decimal places)
@@ -216,11 +216,13 @@ Commit with a clear message that references the ticket:
 - Tests: 14 new tests covering all acceptance criteria
 ```
 
+The ticket ID prefix (`T-XXX:`) is mandatory in every commit message. This ensures every code change is traceable back to its ticket, requirement, and feature doc.
+
 ### 5.3 Push and Create PR
 
 Push the branch and create a pull request. The PR should include:
 
-**Title**: `[T-XXX] Brief description of what was implemented`
+**Title**: `T-XXX: Brief description of what was implemented`
 
 **Body**:
 ```

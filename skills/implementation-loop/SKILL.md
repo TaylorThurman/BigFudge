@@ -163,7 +163,7 @@ The implementer will:
 
 **Important:** The implementer does NOT update TRACKER.md or merge into main. It creates a feature branch and reports back.
 
-**2b. Review the implementation**
+**2c. Review the implementation**
 
 After implementation completes, the same agent invokes the code-reviewer on the feature branch. The reviewer:
 1. Loads context (ticket, PR description, spec)
@@ -171,7 +171,7 @@ After implementation completes, the same agent invokes the code-reviewer on the 
 3. Deep reviews across all 6 dimensions
 4. Produces a structured review report with a verdict
 
-**2c. Handle the verdict (within the agent)**
+**2d. Handle the verdict (within the agent)**
 
 - **APPROVE**: Agent reports success. Branch and PR description are ready.
 - **REQUEST CHANGES**: Agent attempts one self-correction cycle — reads the must-fix findings, re-implements addressing each finding, re-reviews. If second review approves, reports success. If it fails again, agent reports failure with both review reports.
@@ -187,10 +187,34 @@ As each agent completes (not waiting for all agents), the orchestrator immediate
 
 ### On APPROVE:
 
-1. **Merge main into the feature branch.** Pull updated main into the agent's feature branch. If it merges cleanly and tests pass, push and create a PR to merge into main. If there's a conflict, resolve it (see Merge and Conflict Resolution below).
-2. **Update TRACKER.md.** Mark the ticket as `In Review` with a link to the PR. The ticket moves to `Done` only after the human merges the PR.
-3. **Check for newly unblocked tickets.** Tickets whose dependencies are all `In Review` or `Done` are considered ready. An `In Review` ticket has passed code review and tests — the code is complete, it's just awaiting human sign-off.
-4. **Spawn a new agent** if there's an open slot (fewer than 3 running) and a newly ready ticket. This keeps the pipeline full.
+1. **Merge main into the feature branch.** Pull updated main into the agent's feature branch:
+
+```bash
+git checkout feature/T-XXX-description
+git merge main
+```
+
+If it merges cleanly, run the test suite. If tests pass, proceed to step 2. If there's a conflict or tests fail after merge, go to Merge and Conflict Resolution below.
+
+2. **Push the branch and create a PR.** This is mandatory — every ticket gets its own PR:
+
+```bash
+git push -u origin feature/T-XXX-description
+gh pr create --title "T-XXX: Description" --body "## Ticket\n[ticket content]\n\n## Changes\n[summary]"
+```
+
+If `gh` is not available, push the branch and note the PR needs to be created manually. The branch MUST be pushed regardless.
+
+3. **Update TRACKER.md.** Mark the ticket as `In Review` and record the PR number/link. Example:
+
+```
+| T-007 | Bot status component | Slice 2 | T-006 | Small | In Review (#12) |
+```
+
+The ticket moves to `Done` only after the human merges the PR. **This TRACKER update is not optional** — it's what unblocks dependent tickets.
+
+4. **Check for newly unblocked tickets.** Tickets whose dependencies are all `In Review` or `Done` are now ready. An `In Review` ticket has passed code review and tests — the code is complete, it's just awaiting human sign-off.
+5. **Spawn a new agent** if there's an open slot (fewer than 3 running) and a newly ready ticket. This keeps the pipeline full.
 
 ### On REQUEST CHANGES (failed twice):
 

@@ -230,7 +230,18 @@ The ticket ID prefix (`T-XXX:`) is mandatory in every commit message. This ensur
 
 ### 5.3 Push and Create PR
 
-Push the branch and create a pull request. The PR should include:
+Push the branch and create a pull request. **Every ticket gets its own PR — this is not optional.**
+
+**When running standalone** (not inside the implementation-loop):
+
+```bash
+git push -u origin feature/T-XXX-description
+gh pr create --title "T-XXX: Description" --body "[PR body below]"
+```
+
+**When running inside the implementation-loop:** Push the branch and report back to the orchestrator. The orchestrator handles the PR creation and TRACKER update after merging main into the feature branch.
+
+The PR should include:
 
 **Title**: `T-XXX: Brief description of what was implemented`
 

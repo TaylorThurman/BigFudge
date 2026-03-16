@@ -1,5 +1,6 @@
 # Eval workspaces — reproducible, bulky
 evals/
+archive/
 
 # IDE / editor
 .obsidian/
